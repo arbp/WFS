@@ -450,3 +450,12 @@ Aug 01 2007 -- Fixed a compile error with 2007r4
 **Version 2.5.2 -- Dec 09 2010**
 
 Dec 09 2010 -- Updated to compile with REAL Studio 2011 Release 1
+
+
+**Version 2.6.0 -- Dec 22, 2010**
+
+Dec 22, 2010 -- FindFile.Attributes was renamed to FindFile.FileAttributes to avoid conflicts with the Attributes compiler feature
+
+Dec 22, 2010 -- The ToolTip class was renamed to Win32ToolTip to avoid conflicts with the ToolTip framework class
+
+Dec 22, 2010 -- Fixed all of the instances which required Lib "", so the project compiles properly again
