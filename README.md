@@ -3,7 +3,7 @@ WFS
 
 Windows Functionality Suite
 
-v2.5
+v2.6.1
 
 this is the code that Aaron Ballman originally wrote for REALBasic (which is now Xojo).  there have been other contributors over the years, if we can figure them out we will note them below.
 
@@ -41,4 +41,4 @@ if you want to contribute to WFS, please submit a pull request.  we accept as ju
 * Joe Ranieri
 * Carlos Martinho
 * Alessandro Consorti
-
+* Kem Tekinay
