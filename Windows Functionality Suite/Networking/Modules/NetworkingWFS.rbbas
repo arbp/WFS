@@ -88,6 +88,7 @@ Protected Module NetworkingWFS
 	#tag Method, Flags = &h1
 		Protected Function Ping(addy as String) As double
 		  #if TargetWin32
+		    
 		    Declare Function IcmpCreateFile Lib "ICMP" ( ) as Integer
 		    Declare Sub IcmpCloseHandle Lib "ICMP" ( handle as Integer )
 		    Declare Function IcmpSendEcho Lib "ICMP" ( handle as Integer, address as Integer, data as Integer, _
@@ -142,6 +143,11 @@ Protected Module NetworkingWFS
 		    else
 		      return -1.0
 		    end
+		    
+		  #else
+		    
+		    #pragma unused addy
+		    
 		  #endif
 		End Function
 	#tag EndMethod

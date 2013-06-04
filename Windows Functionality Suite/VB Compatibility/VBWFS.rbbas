@@ -15,6 +15,8 @@ Protected Module VBWFS
 		      return
 		    end if
 		  next process
+		  
+		  #pragma unused unused
 		End Sub
 	#tag EndMethod
 
@@ -45,6 +47,7 @@ Protected Module VBWFS
 		  // function can only find a window handle if you know the exact window title. "
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Function FindWindowA Lib "User32" ( className as Integer, title as CString ) as Integer
 		    Soft Declare Function FindWindowW Lib "User32" ( className as Integer, title as WString ) as Integer
 		    
@@ -62,17 +65,29 @@ Protected Module VBWFS
 		      SetForegroundWindow( handle )
 		    end if
 		    
+		  #else
+		    
+		    #pragma unused title
+		    
 		  #endif
+		  
+		  #pragma unused unused
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function ASCIIToScanKey(char as String) As Integer
 		  #if TargetWin32
+		    
 		    Declare Function VkKeyScanA Lib "User32" ( ch as Integer ) as Short
 		    
 		    dim theAscVal as Integer = Asc( char )
 		    return VkKeyScanA( theAscVal )
+		    
+		  #else
+		    
+		    #pragma unused char
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -88,6 +103,7 @@ Protected Module VBWFS
 		Protected Sub ChDir(path as String)
 		  // We want to change the active directory.  Easy enough!
 		  #if TargetWin32
+		    
 		    Soft Declare Function SetCurrentDirectoryA Lib "Kernel32" ( dir as CString ) as Boolean
 		    Soft Declare Function SetCurrentDirectoryW Lib "Kernel32" ( dir as WString ) as Boolean
 		    
@@ -98,6 +114,11 @@ Protected Module VBWFS
 		    else
 		      success = SetCurrentDirectoryA( path )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused path
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -137,6 +158,8 @@ Protected Module VBWFS
 		Protected Function CurDir(unused as String = "") As String
 		  // The user just wants the path to the current directory
 		  return GetCurrentDirectory.AbsolutePath
+		  #pragma unused unused
+		  
 		End Function
 	#tag EndMethod
 
@@ -246,12 +269,20 @@ Protected Module VBWFS
 	#tag Method, Flags = &h21
 		Private Function FillString(char as String, numChars as Integer) As String
 		  #if TargetWin32
+		    
 		    Declare Sub memset lib "msvcrt" ( dest as Ptr, char as Integer, count as Integer )
 		    
 		    dim mb as new MemoryBlock( LenB( char ) * numChars )
 		    memset( mb, AscB( char ), numChars )
 		    
 		    return DefineEncoding( mb, Encoding( char ) )
+		    
+		  #else
+		    
+		    #pragma unused char
+		    #pragma unused numChars
+		    return ""
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -477,6 +508,14 @@ Protected Module VBWFS
 		  // IPmt is the principle for the previous month times the interest rate
 		  // http://www.gnome.org/projects/gnumeric/doc/gnumeric-IPMT.shtml
 		  
+		  // IMPLEMENT THIS -KT
+		  
+		  #pragma unused rate
+		  #pragma unused per
+		  #pragma unused nper
+		  #pragma unused pv
+		  #pragma unused fv
+		  #pragma unused type
 		  
 		End Function
 	#tag EndMethod
@@ -492,6 +531,7 @@ Protected Module VBWFS
 	#tag Method, Flags = &h21
 		Private Sub KeyDown(virtualKeyCode as Integer, extendedKey as Boolean = false)
 		  #if TargetWin32
+		    
 		    Declare Sub keybd_event Lib "User32" ( keyCode as Integer, scanCode as Integer, _
 		    flags as Integer, extraData as Integer )
 		    
@@ -503,6 +543,12 @@ Protected Module VBWFS
 		    
 		    ' Press the key
 		    keybd_event( virtualKeyCode, 0, flags, 0 )
+		    
+		  #else
+		    
+		    #pragma unused virtualKeyCode
+		    #pragma unused extendedKey
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -510,6 +556,7 @@ Protected Module VBWFS
 	#tag Method, Flags = &h21
 		Private Sub KeyUp(virtualKeyCode as Integer, extendedKey as Boolean = false)
 		  #if TargetWin32
+		    
 		    Declare Sub keybd_event Lib "User32" ( keyCode as Integer, scanCode as Integer, _
 		    flags as Integer, extraData as Integer )
 		    
@@ -522,6 +569,12 @@ Protected Module VBWFS
 		    Const KEYEVENTF_KEYUP = &h2
 		    flags = BitwiseOr( flags, KEYEVENTF_KEYUP )
 		    keybd_event( virtualKeyCode, 0, flags, 0 )
+		    
+		  #else
+		    
+		    #pragma unused virtualKeyCode
+		    #pragma unused extendedKey
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -679,7 +732,10 @@ Protected Module VBWFS
 	#tag Method, Flags = &h1
 		Protected Sub Mid(ByRef text As String, startPos As Integer, length As Integer = - 1, assigns subStr As String)
 		  // handle optional length parameter
-		  dim max as Integer = Len(  text )
+		  // (added by Kem Tekinay, 6-4-13)
+		  if length < 0 then
+		    length = text.Len - startPos + 1
+		  end if
 		  
 		  // Assign the replacement to the original data
 		  text = left( text, startPos ) + Left( subStr, length ) + _
@@ -872,7 +928,6 @@ Protected Module VBWFS
 		  // REALbasic doesn't let you do specify a start position for
 		  // the source string in Replace
 		  dim searchStr as String = Mid( source, start )
-		  dim curPos as Integer = 1
 		  
 		  if count = -1 then
 		    // We just want to do a replace all
@@ -1264,6 +1319,9 @@ Protected Module VBWFS
 		      end if
 		    end select
 		  next token
+		  
+		  #pragma unused unused
+		  
 		End Sub
 	#tag EndMethod
 
@@ -1280,6 +1338,7 @@ Protected Module VBWFS
 		  // We want to launch the application given by the path name, and
 		  // we need to return the application's PID if the launch was successful
 		  #if TargetWin32
+		    
 		    Soft Declare Function CreateProcessW Lib "Kernel32" ( appName as Integer, params as WString, _
 		    procAttribs as Integer, threadAttribs as Integer, inheritHandles as Boolean, flags as Integer, _
 		    env as Integer, curDir as Integer, startupInfo as Ptr, procInfo as Ptr ) as Boolean
@@ -1321,6 +1380,12 @@ Protected Module VBWFS
 		    CloseHandle( procInfo.Long( 4 ) )
 		    
 		    return retVal
+		    
+		  #else
+		    
+		    #pragma unused pathname
+		    #pragma unused style
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -1394,11 +1459,13 @@ Protected Module VBWFS
 		  // midnight.  We do this the cheap way.
 		  dim midnight as new Date
 		  midnight.Hour = 0
+		  midnight.Minute = 0
+		  midnight.Second = 0
 		  
 		  // Now that we have midnight and now, we
 		  // can figure out the number of seconds by
 		  // subtracting the totalseconds of each
-		  return now.TotalSeconds - midnight.TotalSeconds
+		  return d.TotalSeconds - midnight.TotalSeconds
 		End Function
 	#tag EndMethod
 

@@ -316,6 +316,11 @@ Protected Class LocaleInformationWFS
 		    
 		    Const LOCALE_SMONTHOUSANDSEP = &h17
 		    ret = GetLocaleInfo( LOCALE_SMONTHOUSANDSEP, mb, MonetaryThousandsSeparator )
+		    
+		  #else
+		    
+		    #pragma unused localeID
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -393,6 +398,9 @@ Protected Class LocaleInformationWFS
 		  'end if
 		  '
 		  'return form
+		  
+		  #pragma unused currencyValue
+		  
 		End Function
 	#tag EndMethod
 

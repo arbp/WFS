@@ -3,6 +3,7 @@ Protected Module ServiceManagerWFS
 	#tag Method, Flags = &h1
 		Protected Sub AddService(ByRef serv as ServiceWFS)
 		  #if TargetWin32
+		    
 		    Soft Declare Function CreateServiceA Lib "AdvApi32" ( manager as Integer, name as CString, _
 		    displayName as CString, access as Integer, serviceType as Integer, startType as Integer, _
 		    errorControl as Integer, binaryPath as CString, loadOrder as CString, tagID as Integer, _
@@ -34,6 +35,11 @@ Protected Module ServiceManagerWFS
 		    if serv.Handle <> 0 then
 		      ModifyService( serv )
 		    end
+		    
+		  #else
+		    
+		    #pragma unused serv
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -41,7 +47,13 @@ Protected Module ServiceManagerWFS
 	#tag Method, Flags = &h1
 		Protected Sub CloseService(serv as ServiceWFS)
 		  #if TargetWin32
+		    
 		    CloseServiceHandle( serv.Handle )
+		    
+		  #else
+		    
+		    #pragma unused serv
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -49,9 +61,15 @@ Protected Module ServiceManagerWFS
 	#tag Method, Flags = &h21
 		Private Sub CloseServiceHandle(handle as Integer)
 		  #if TargetWin32
+		    
 		    Declare Sub CloseServiceHandle Lib "AdvApi32" ( handle as Integer )
 		    
 		    CloseServiceHandle( handle )
+		    
+		  #else
+		    
+		    #pragma unused handle
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -59,6 +77,7 @@ Protected Module ServiceManagerWFS
 	#tag Method, Flags = &h21
 		Private Sub FillServiceInformation(ByRef serv as ServiceWFS)
 		  #if TargetWin32
+		    
 		    Soft Declare Function QueryServiceConfigA Lib "AdvApi32" ( handle as Integer, _
 		    config as Ptr, size as Integer, ByRef bytesNeeded as Integer ) as Boolean
 		    Soft Declare Function QueryServiceConfigW Lib "AdvApi32" ( handle as Integer, _
@@ -164,6 +183,11 @@ Protected Module ServiceManagerWFS
 		    catch excerr2 as RuntimeException
 		      
 		    end
+		    
+		  #else
+		    
+		    #pragma unused serv
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -187,6 +211,7 @@ Protected Module ServiceManagerWFS
 		  // You have to be sure that the service was opened with the ability to change
 		  // the configuration.
 		  #if TargetWin32
+		    
 		    Soft Declare Sub ChangeServiceConfigA Lib "AdvApi32" ( handle as Integer, type as Integer, _
 		    startType as Integer, errorControl as Integer, path as CString, loadGroup as CString, _
 		    tag as Integer, dependencies as CString, startName as CString, password as CString, _
@@ -229,6 +254,11 @@ Protected Module ServiceManagerWFS
 		      descHandle.Ptr( 0 ) = description
 		      ChangeServiceConfig2A( serv.Handle, &h1, descHandle )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused serv
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -262,6 +292,7 @@ Protected Module ServiceManagerWFS
 		  dim serv as ServiceWFS
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Function OpenServiceA Lib "AdvApi32" ( manager as Integer, name as CString, _
 		    access as Integer ) as Integer
 		    Soft Declare Function OpenServiceW Lib "AdvApi32" ( manager as Integer, name as WString, _
@@ -281,6 +312,12 @@ Protected Module ServiceManagerWFS
 		    if Bitwise.BitAnd( access, kAccessServiceQueryConfig ) <> 0 then
 		      FillServiceInformation( serv )
 		    end
+		    
+		  #else
+		    
+		    #pragma unused name
+		    #pragma unused access
+		    
 		  #endif
 		  
 		  return serv
@@ -290,6 +327,7 @@ Protected Module ServiceManagerWFS
 	#tag Method, Flags = &h1
 		Protected Sub RemoveService(s as ServiceWFS)
 		  #if TargetWin32
+		    
 		    // We want to delete the service, so this assumes that we
 		    // have already opened the service.  If we don't have a Handle
 		    // then we will try to use the Name
@@ -317,6 +355,10 @@ Protected Module ServiceManagerWFS
 		    if closeTheHandle then
 		      CloseServiceHandle( handle )
 		    end
+		    
+		  #else
+		    
+		    #pragma unused s
 		    
 		  #endif
 		End Sub

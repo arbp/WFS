@@ -29,11 +29,13 @@ Protected Module OSVersionInformationWFS
 		  if mInitialized then return
 		  mInitialized = true
 		  
-		  Dim m As MemoryBlock
-		  dim res as boolean
-		  dim dwOSVersionInfoSize,wsuitemask,ret,i as integer
-		  dim szCSDVersion,s as string
 		  #if targetwin32 then
+		    
+		    Dim m As MemoryBlock
+		    dim res as boolean
+		    dim dwOSVersionInfoSize,wsuitemask,ret,i as integer
+		    dim szCSDVersion, s as string
+		    
 		    Soft Declare Function GetVersionExA Lib "kernel32" (lpVersionInformation As ptr) As integer
 		    Soft Declare Function GetVersionExW Lib "kernel32" (lpVersionInformation As ptr) As integer
 		    

@@ -16,10 +16,16 @@ Protected Module ApplicationRecoveryWFS
 	#tag Method, Flags = &h1
 		Protected Sub RecoveryFinished(success as Boolean)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub ApplicationRecoveryFinished Lib "Kernel32" ( success as Boolean )
 		    if System.IsFunctionAvailable( "ApplicationRecoveryFinished", "Kernel32" ) then
 		      ApplicationRecoveryFinished( success )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused success
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -41,12 +47,19 @@ Protected Module ApplicationRecoveryWFS
 	#tag Method, Flags = &h1
 		Protected Sub RegisterRecoveryCallback(callback as ApplicationRecoveryCallbackProviderWFS, param as UInt32)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub RegisterApplicationRecoveryCallback Lib "Kernel32" ( callback as Ptr, param as UInt32, ping as UInt32, flags as UInt32 )
 		    
 		    if callback <> nil and System.IsFunctionAvailable( "RegisterApplicationRecoveryCallback", "Kernel32" ) then
 		      mCallback = callback
 		      RegisterApplicationRecoveryCallback( AddressOf RecoveryCallback, param, 0, 0 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused callback
+		    #pragma unused param
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -54,11 +67,18 @@ Protected Module ApplicationRecoveryWFS
 	#tag Method, Flags = &h1
 		Protected Sub RegisterRestart(commandLine as String, flags as Integer)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub RegisterApplicationRestart Lib "Kernel32" ( cmdLine as WString, flags as UInt32 )
 		    
 		    if System.IsFunctionAvailable( "RegisterApplicationRestart", "Kernel32" ) then
 		      RegisterApplicationRestart( commandLine, flags )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused commandLine
+		    #pragma unused flags
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

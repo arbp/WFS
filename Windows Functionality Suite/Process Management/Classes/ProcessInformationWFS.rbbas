@@ -216,6 +216,11 @@ Protected Class ProcessInformationWFS
 		      // Close our handle to the process
 		      CloseHandle( processHandle )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused exitCode
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

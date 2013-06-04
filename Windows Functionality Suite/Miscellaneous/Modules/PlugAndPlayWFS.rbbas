@@ -619,7 +619,7 @@ Protected Module PlugAndPlayWFS
 	#tag Method, Flags = &h21
 		Private Function Pad(s as String, numDigits as Integer) As String
 		  dim ret as String
-		  dim start, numZeros, i as Integer
+		  dim numZeros, i as Integer
 		  
 		  numZeros = numDigits - Len( s )
 		  for i = 0 to numZeros - 1
