@@ -136,15 +136,14 @@ Protected Module FileProcessingWFS
 
 	#tag Method, Flags = &h1
 		Protected Function GetSpecialFolder(CSIDL as integer) As folderItem
-		  Dim myPidl as integer
-		  Dim myErr as integer
-		  Dim sPath as string
-		  Dim mb as MemoryBlock
 		  Dim f as FolderItem
 		  
-		  mb = new MemoryBlock(256)
-		  
 		  #if targetWin32
+		    
+		    Dim myPidl as integer
+		    Dim myErr as integer
+		    Dim sPath as string
+		    Dim mb as new MemoryBlock(256)
 		    
 		    declare Function SHGetSpecialFolderLocation Lib "shell32"(hwnd as integer, nFolder as integer, byref pidl as integer) as integer
 		    
@@ -161,6 +160,10 @@ Protected Module FileProcessingWFS
 		      myErr = SHGetPathFromIDListA(myPidl,mb)
 		      f = GetFolderItem(mb.CString(0))
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused CSIDL
 		    
 		  #endif
 		  

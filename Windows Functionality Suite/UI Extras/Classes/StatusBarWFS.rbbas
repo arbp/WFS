@@ -232,13 +232,12 @@ Implements WndProcSubclassWFS
 		  // ADDED BY Carlos Martinho (2006-SEP-10)
 		  // To hide the status bar
 		  
-		  dim e as integer
-		  
 		  #if TargetWin32
 		    
 		    const SW_HIDE = 0
 		    Declare Function ShowWindow Lib "user32" (hwnd as Integer, nCmdShow as Integer) as Integer
 		    
+		    dim e as integer
 		    if hWnd <> 0 then
 		      e = ShowWindow( hWnd, SW_HIDE )
 		    end
@@ -489,13 +488,13 @@ Implements WndProcSubclassWFS
 		  // ADDED BY Carlos Martinho (2006-SEP-10)
 		  // To show the status bar
 		  
-		  dim e as integer
-		  
 		  #if TargetWin32
 		    
 		    const SW_NORMAL = 1
+		    
 		    Declare Function ShowWindow Lib "user32" (hwnd as Integer, nCmdShow as Integer) as Integer
 		    
+		    dim e as integer
 		    if hWnd <> 0 then
 		      e = ShowWindow( hWnd, SW_NORMAL )
 		    end

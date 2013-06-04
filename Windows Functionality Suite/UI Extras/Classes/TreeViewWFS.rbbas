@@ -447,7 +447,6 @@ Implements WndProcSubclassWFS
 		  Dim newItemOffset as Integer = oldItemOffset + 40
 		  dim oldItemHandle, newItemHandle as Integer
 		  dim item as TreeViewItemWFS
-		  Dim textLen as Integer
 		  
 		  Const TVIF_TEXT               = &h0001
 		  Const TVIF_IMAGE              = &h0002

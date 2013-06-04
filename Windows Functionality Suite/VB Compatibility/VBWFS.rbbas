@@ -679,7 +679,7 @@ Protected Module VBWFS
 	#tag Method, Flags = &h1
 		Protected Sub Mid(ByRef text As String, startPos As Integer, length As Integer = - 1, assigns subStr As String)
 		  // handle optional length parameter
-		  dim max as Integer = Len(  text )
+		  'dim max as Integer = Len(  text )
 		  
 		  // Assign the replacement to the original data
 		  text = left( text, startPos ) + Left( subStr, length ) + _
@@ -872,7 +872,6 @@ Protected Module VBWFS
 		  // REALbasic doesn't let you do specify a start position for
 		  // the source string in Replace
 		  dim searchStr as String = Mid( source, start )
-		  dim curPos as Integer = 1
 		  
 		  if count = -1 then
 		    // We just want to do a replace all
@@ -1394,11 +1393,13 @@ Protected Module VBWFS
 		  // midnight.  We do this the cheap way.
 		  dim midnight as new Date
 		  midnight.Hour = 0
+		  midnight.Minute = 0
+		  midnight.Second = 0
 		  
 		  // Now that we have midnight and now, we
 		  // can figure out the number of seconds by
 		  // subtracting the totalseconds of each
-		  return now.TotalSeconds - midnight.TotalSeconds
+		  return d.TotalSeconds - midnight.TotalSeconds
 		End Function
 	#tag EndMethod
 

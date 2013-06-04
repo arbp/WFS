@@ -291,27 +291,28 @@ Inherits InternetSessionWFS
 
 	#tag Method, Flags = &h0
 		Sub PutFile(f as FolderItem, remoteName as String = "")
-		  // Sanity checks
-		  if f.Directory then
-		    FireException( "Trying to put a directory by calling PutFile" )
-		    return
-		  end if
-		  
-		  if mFTPHandle = 0 then
-		    FireException( "Trying to put a file while not connected" )
-		    return
-		  end if
-		  
-		  // The first thing we need to do is make
-		  // sure that our local directory is correct.
-		  SetLocalDirectory( f.Parent )
-		  
-		  // Setup our support code
-		  if remoteName = "" then remoteName = f.Name
-		  
-		  dim flags as Integer = TransferType
-		  
 		  #if TargetWin32
+		    
+		    // Sanity checks
+		    if f.Directory then
+		      FireException( "Trying to put a directory by calling PutFile" )
+		      return
+		    end if
+		    
+		    if mFTPHandle = 0 then
+		      FireException( "Trying to put a file while not connected" )
+		      return
+		    end if
+		    
+		    // The first thing we need to do is make
+		    // sure that our local directory is correct.
+		    SetLocalDirectory( f.Parent )
+		    
+		    // Setup our support code
+		    if remoteName = "" then remoteName = f.Name
+		    
+		    dim flags as Integer = TransferType
+		    
 		    Soft Declare Function FtpPutFileA Lib "WinInet" ( handle as Integer, localFile as CString, remoteFile as CString, _
 		    flags as Integer, context as Integer ) as Boolean
 		    Soft Declare Function FtpPutFileW Lib "WinInet" ( handle as Integer, localFile as WString, remoteFile as WString, _
@@ -329,6 +330,12 @@ Inherits InternetSessionWFS
 		      FireException( "Could not upload the file" )
 		      return
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused remoteName
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

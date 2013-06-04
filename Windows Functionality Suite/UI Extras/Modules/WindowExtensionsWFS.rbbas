@@ -61,9 +61,10 @@ Protected Module WindowExtensionsWFS
 
 	#tag Method, Flags = &h0
 		Sub BringToFront(extends w as Window)
-		  Dim i, h, r As Integer
-		  
 		  #if TargetWin32
+		    
+		    Dim i, h, r As Integer
+		    
 		    if not w.visible then
 		      w.visible = true
 		    end if
@@ -84,6 +85,11 @@ Protected Module WindowExtensionsWFS
 		    i = BringWindowToTop( h )
 		    i = SetForegroundWindow( h )
 		    w.FlashWindowEx( 3 )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
