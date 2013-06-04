@@ -679,7 +679,10 @@ Protected Module VBWFS
 	#tag Method, Flags = &h1
 		Protected Sub Mid(ByRef text As String, startPos As Integer, length As Integer = - 1, assigns subStr As String)
 		  // handle optional length parameter
-		  'dim max as Integer = Len(  text )
+		  // (added by Kem Tekinay, 6-4-13)
+		  if length < 0 then
+		    length = text.Len - startPos + 1
+		  end if
 		  
 		  // Assign the replacement to the original data
 		  text = left( text, startPos ) + Left( subStr, length ) + _
