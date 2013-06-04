@@ -3,6 +3,7 @@ Protected Module MDIWindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub CascadeChildren(extends w as MDIWindow)
 		  #if TargetWin32
+		    
 		    Declare Sub CascadeWindows Lib "User32" ( parent as Integer, how as Integer, r as Integer, num as Integer, kids as Integer )
 		    
 		    dim clientHandle as Integer = w.MDIClientHandle
@@ -11,6 +12,11 @@ Protected Module MDIWindowExtensionsWFS
 		    if clientHandle <> 0 then
 		      CascadeWindows( clientHandle, 0, 0, 0, 0 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -18,6 +24,7 @@ Protected Module MDIWindowExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Sub ChangeWindowStyle(w as MDIWindow, flag as Integer, set as Boolean)
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    Dim newFlags as Integer
 		    Dim styleFlags As Integer
@@ -48,6 +55,13 @@ Protected Module MDIWindowExtensionsWFS
 		    styleFlags = SetWindowLong( w.Handle, GWL_STYLE, newFlags )
 		    styleFlags = SetWindowPos( w.Handle, 0, 0, 0, 0, 0, SWP_NOMOVE +_
 		    SWP_NOSIZE + SWP_NOZORDER + SWP_FRAMECHANGED )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused flag
+		    #pragma unused set
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -55,6 +69,7 @@ Protected Module MDIWindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Function CloseButtonState(extends w as MDIWindow) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function GetSystemMenu Lib "User32" ( wnd as Integer, revert as Boolean ) as Integer
 		    Declare Function GetMenuState Lib "User32" ( menu as Integer, which as Integer, flags as Integer ) as Integer
 		    
@@ -71,6 +86,11 @@ Protected Module MDIWindowExtensionsWFS
 		    state = GetMenuState( menu, SC_CLOSE, MF_BYCOMMAND )
 		    
 		    return Bitwise.BitAnd( state, MF_DISABLED + MF_GRAYED ) = 0
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -78,6 +98,7 @@ Protected Module MDIWindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub CloseButtonState(extends w as MDIWindow, assigns enabled as Boolean)
 		  #if TargetWin32
+		    
 		    Declare Function GetSystemMenu Lib "User32" ( wnd as Integer, revert as Boolean ) as Integer
 		    Declare Sub EnableMenuItem Lib "User32" ( menu as Integer, which as Integer, flags as Integer )
 		    
@@ -94,6 +115,12 @@ Protected Module MDIWindowExtensionsWFS
 		    else
 		      EnableMenuItem( menu, SC_CLOSE, MF_BYCOMMAND + MF_ENABLED )
 		    end
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused enabled
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -101,6 +128,7 @@ Protected Module MDIWindowExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Function enumChildProc(hwnd as Integer, lParam as Integer) As Boolean
 		  #if TargetWin32
+		    
 		    // We need to figure out what class this window belongs to
 		    Soft Declare Function GetClassNameW Lib "User32" ( hwnd as Integer, name as Ptr, count as Integer ) as Integer
 		    Soft Declare Function GetClassNameA Lib "User32" ( hwnd as Integer, name as Ptr, count as Integer ) as Integer
@@ -124,6 +152,12 @@ Protected Module MDIWindowExtensionsWFS
 		    end if
 		    
 		    return true
+		    
+		  #else
+		    
+		    #pragma unused hwnd
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -179,9 +213,15 @@ Protected Module MDIWindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Function IsMaximized(extends w as MDIWindow) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function IsZoomed Lib "User32" ( hwnd As Integer ) As Integer
 		    
 		    return IsZoomed( w.Handle ) <> 0
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -189,9 +229,15 @@ Protected Module MDIWindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Function IsMinimized(extends w as MDIWindow) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function IsIconic Lib "User32" ( hwnd As Integer ) As Integer
 		    
 		    return IsIconic( w.Handle ) <> 0
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -206,6 +252,7 @@ Protected Module MDIWindowExtensionsWFS
 		  if mClientHandle <> 0 then return mClientHandle
 		  
 		  #if TargetWin32
+		    
 		    Declare Sub EnumChildWindows Lib "User32" ( parent as Integer, proc as Ptr, lParam as Integer )
 		    
 		    mClientHandle = 0
@@ -215,6 +262,11 @@ Protected Module MDIWindowExtensionsWFS
 		    
 		    // Return the client's handle
 		    return mClientHandle
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -222,6 +274,7 @@ Protected Module MDIWindowExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Function TestWindowStyle(w as MDIWindow, flag as Integer) As Boolean
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    
 		    Const GWL_STYLE = -16
@@ -236,6 +289,12 @@ Protected Module MDIWindowExtensionsWFS
 		    else
 		      return false
 		    end
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused flag
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -243,6 +302,7 @@ Protected Module MDIWindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub TileChildren(extends w as MDIWindow, horizontal as Boolean = true)
 		  #if TargetWin32
+		    
 		    Declare Sub TileWindows Lib "User32" ( parent as Integer, how as Integer, r as Integer, num as Integer, kids as Integer )
 		    
 		    dim clientHandle as Integer = w.MDIClientHandle
@@ -254,6 +314,12 @@ Protected Module MDIWindowExtensionsWFS
 		    if clientHandle <> 0 then
 		      TileWindows( clientHandle, how, 0, 0, 0 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused horizontal
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

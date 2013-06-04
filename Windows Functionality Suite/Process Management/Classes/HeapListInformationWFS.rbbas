@@ -28,6 +28,7 @@ Protected Class HeapListInformationWFS
 	#tag Method, Flags = &h0
 		Sub LoadHeapEntries(entryCallback as HeapEntryLoadedCallbackWFS = nil)
 		  #if TargetWin32
+		    
 		    Soft Declare Function Heap32First Lib "Kernel32" ( heapEntry as Ptr, processID as Integer, heapID as Integer ) as Boolean
 		    Soft Declare Function Heap32Next Lib "Kernel32" ( entry as Ptr ) as Integer
 		    
@@ -51,6 +52,11 @@ Protected Class HeapListInformationWFS
 		      
 		      good = Heap32Next( mb )
 		    loop until good = 0
+		    
+		  #else
+		    
+		    #pragma unused entryCallback
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

@@ -33,6 +33,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Sub ChangeWindowStyle(w as Integer, flag as Integer, set as Boolean)
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    Dim newFlags as Integer
 		    Dim styleFlags As Integer
@@ -63,6 +64,13 @@ Protected Module PushButtonExtensionsWFS
 		    styleFlags = SetWindowLong( w, GWL_STYLE, newFlags )
 		    styleFlags = SetWindowPos( w, 0, 0, 0, 0, 0, SWP_NOMOVE +_
 		    SWP_NOSIZE + SWP_NOZORDER + SWP_FRAMECHANGED )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused flag
+		    #pragma unused set
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -141,6 +149,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Function SendMessage(hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Soft Declare Function SendMessageA Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer ) as Integer
 		    Soft Declare Function SendMessageW Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer ) as Integer
 		    
@@ -149,6 +158,14 @@ Protected Module PushButtonExtensionsWFS
 		    else
 		      return SendMessageA( hwnd, msg, wParam, lParam )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused hwnd
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -156,6 +173,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Function TestWindowStyle(w as Integer, flag as Integer) As Boolean
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    
 		    Const GWL_STYLE = -16
@@ -170,6 +188,12 @@ Protected Module PushButtonExtensionsWFS
 		    else
 		      return false
 		    end
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused flag
+		    
 		  #endif
 		End Function
 	#tag EndMethod

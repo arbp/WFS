@@ -20,6 +20,7 @@ Protected Class DateTimePickerWFS
 	#tag Method, Flags = &h0
 		Sub Create(onWindow as Window, x as Integer, y as Integer, width as Integer, height as Integer, datePicker as Boolean = true)
 		  #if TargetWin32
+		    
 		    Const DATETIMEPICK_CLASS = "SysDateTimePick32"
 		    
 		    Soft Declare Function CreateWindowExA Lib "User32" ( ex as Integer, className as CString, _
@@ -63,6 +64,16 @@ Protected Class DateTimePickerWFS
 		      WS_CHILD + WS_BORDER + WS_VISIBLE + flags, _
 		      x, y, width, height, onWindow.WinHWND, 0, hInstance, 0 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused onWindow
+		    #pragma unused x
+		    #pragma unused y
+		    #pragma unused width
+		    #pragma unused height
+		    #pragma unused datePicker
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

@@ -61,6 +61,7 @@ Protected Module FileProcessingWFS
 	#tag Method, Flags = &h1
 		Protected Function GetDriveType(root as FolderItem) As String
 		  #if TargetWin32
+		    
 		    Soft Declare Function GetDriveTypeA Lib "Kernel32" ( drive as CString ) as Integer
 		    Soft Declare Function GetDriveTypeW Lib "Kernel32" ( drive as WString ) as Integer
 		    
@@ -94,6 +95,11 @@ Protected Module FileProcessingWFS
 		    end
 		    
 		    return "Unknown"
+		    
+		  #else
+		    
+		    #pragma unused root
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -101,6 +107,7 @@ Protected Module FileProcessingWFS
 	#tag Method, Flags = &h1
 		Protected Function GetFreeDiskSpaceForCaller(root as FolderItem) As Double
 		  #if TargetWin32
+		    
 		    Soft Declare Sub GetDiskFreeSpaceExA Lib "Kernel32" ( directory as CString, freeBytesForCaller as Ptr, _
 		    totalBytes as Ptr, totalFreeBytes as Ptr )
 		    Soft Declare Sub GetDiskFreeSpaceExW Lib "Kernel32" ( directory as WString, freeBytesForCaller as Ptr, _
@@ -130,6 +137,11 @@ Protected Module FileProcessingWFS
 		    ret = ret + low
 		    
 		    return ret
+		    
+		  #else
+		    
+		    #pragma unused root
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -175,6 +187,7 @@ Protected Module FileProcessingWFS
 	#tag Method, Flags = &h1
 		Protected Function GetTotalBytes(root as FolderItem) As double
 		  #if TargetWin32
+		    
 		    Soft Declare Sub GetDiskFreeSpaceExA Lib "Kernel32" ( directory as CString, freeBytesForCaller as Ptr, _
 		    totalBytes as Ptr, totalFreeBytes as Ptr )
 		    Soft Declare Sub GetDiskFreeSpaceExW Lib "Kernel32" ( directory as WString, freeBytesForCaller as Ptr, _
@@ -204,6 +217,11 @@ Protected Module FileProcessingWFS
 		    ret = ret + low
 		    
 		    return ret
+		    
+		  #else
+		    
+		    #pragma unused root
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -211,6 +229,7 @@ Protected Module FileProcessingWFS
 	#tag Method, Flags = &h1
 		Protected Function GetTotalFreeSpace(root as FolderItem) As double
 		  #if TargetWin32
+		    
 		    Soft Declare Sub GetDiskFreeSpaceExA Lib "Kernel32" ( directory as CString, freeBytesForCaller as Ptr, _
 		    totalBytes as Ptr, totalFreeBytes as Ptr )
 		    Soft Declare Sub GetDiskFreeSpaceExW Lib "Kernel32" ( directory as WString, freeBytesForCaller as Ptr, _
@@ -240,6 +259,11 @@ Protected Module FileProcessingWFS
 		    ret = ret + low
 		    
 		    return ret
+		    
+		  #else
+		    
+		    #pragma unused root
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -297,6 +321,7 @@ Protected Module FileProcessingWFS
 	#tag Method, Flags = &h1
 		Protected Function GetVolumeName(root as FolderItem) As String
 		  #if TargetWin32
+		    
 		    Soft Declare Function GetVolumeInformationA Lib "Kernel32" ( root as CString, _
 		    volName as Ptr, volNameSize as Integer, ByRef volSer as Integer, ByRef _
 		    maxCompLength as Integer, ByRef sysFlags as Integer, sysName as Ptr, _
@@ -322,6 +347,11 @@ Protected Module FileProcessingWFS
 		      
 		      return volName.CString( 0 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused root
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -329,6 +359,7 @@ Protected Module FileProcessingWFS
 	#tag Method, Flags = &h1
 		Protected Function GetVolumeSerial(root as FolderItem) As String
 		  #if TargetWin32
+		    
 		    Soft Declare Function GetVolumeInformationA Lib "Kernel32" ( root as CString, _
 		    volName as Ptr, volNameSize as Integer, ByRef volSer as Integer, ByRef _
 		    maxCompLength as Integer, ByRef sysFlags as Integer, sysName as Ptr, _
@@ -353,6 +384,11 @@ Protected Module FileProcessingWFS
 		    
 		    dim hexStr as String = Hex( volSerial )
 		    return Left( hexStr, 4 ) + "-" + Right( hexStr, 4 )
+		    
+		  #else
+		    
+		    #pragma unused root
+		    
 		  #endif
 		End Function
 	#tag EndMethod

@@ -3,6 +3,7 @@ Protected Module UIExtrasWFS
 	#tag Method, Flags = &h1
 		Protected Function CountWindowsWithPartialTitle(partial as String) As Integer
 		  #if TargetWin32
+		    
 		    // Return number of matching windows
 		    Soft Declare Function FindWindowA Lib "user32.dll" ( lpClassName As integer, lpWindowName As integer ) as integer
 		    Soft Declare Function FindWindowW Lib "user32.dll" ( lpClassName As integer, lpWindowName As integer ) as integer
@@ -37,6 +38,11 @@ Protected Module UIExtrasWFS
 		    wend
 		    
 		    return wincount
+		    
+		  #else
+		    
+		    #pragma unused partial
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -44,6 +50,7 @@ Protected Module UIExtrasWFS
 	#tag Method, Flags = &h1
 		Protected Function FindWindowHandleFromPartialTitle(partial as String) As Integer
 		  #if TargetWin32
+		    
 		    // Return number of matching windows
 		    Soft Declare Function FindWindowA Lib "user32.dll" ( lpClassName As integer, lpWindowName As integer ) as integer
 		    Soft Declare Function FindWindowW Lib "user32.dll" ( lpClassName As integer, lpWindowName As integer ) as integer
@@ -77,14 +84,21 @@ Protected Module UIExtrasWFS
 		      ret = GetWindow( ret, GW_HWNDNEXT )
 		    wend
 		    
-		    return 0
+		  #else
+		    
+		    #pragma unused partial
+		    
 		  #endif
+		  
+		  return 0
+		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
 		Protected Sub TemporarilyInstallFont(fontFile as FolderItem, privateFont as Boolean = true)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub AddFontResourceExW Lib "Gdi32" ( filename as WString, flags as Integer, reserved as Integer )
 		    Soft Declare Sub AddFontResourceA Lib "Gdi32" ( filename as CString )
 		    Soft Declare Sub AddFontResourceW Lib "Gdi32" ( filename as WString )
@@ -108,6 +122,12 @@ Protected Module UIExtrasWFS
 		        AddFontResourceA( fontFile.AbsolutePath )
 		      end if
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused fontFile
+		    #pragma unused privateFont
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -115,6 +135,7 @@ Protected Module UIExtrasWFS
 	#tag Method, Flags = &h1
 		Protected Sub UninstallTemporaryFont(fontFile as FolderItem)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub RemoveFontResourceExW Lib "Gdi32" ( filename as WString, flags as Integer, reserved as Integer )
 		    Soft Declare Sub RemoveFontResourceA Lib "Gdi32" ( filename as CString )
 		    Soft Declare Sub RemoveFontResourceW Lib "Gdi32" ( filename as WString )
@@ -130,6 +151,11 @@ Protected Module UIExtrasWFS
 		    else
 		      RemoveFontResourceA( fontFile.AbsolutePath )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused fontFile
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

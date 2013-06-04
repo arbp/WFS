@@ -4,6 +4,7 @@ Implements WndProcSubclassWFS
 	#tag Method, Flags = &h21
 		Private Function AddImageToImageList(p as Picture) As Integer
 		  #if TargetWin32
+		    
 		    Declare Function ImageList_Create Lib "comctl32" ( cx as Integer, cy as Integer, _
 		    flags as Integer, initialSize as Integer, growBy as Integer ) as Integer
 		    
@@ -59,6 +60,11 @@ Implements WndProcSubclassWFS
 		    DeleteObject( hbitmap )
 		    
 		    return index
+		    
+		  #else
+		    
+		    #pragma unused p
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -66,6 +72,7 @@ Implements WndProcSubclassWFS
 	#tag Method, Flags = &h0
 		Sub AddItem(ByRef item as TreeViewItemWFS, parent as TreeViewItemWFS = nil)
 		  #if TargetWin32
+		    
 		    // Set up the proper structure we need to add a new item in
 		    // the TreeView.
 		    Dim TVM_INSERTITEMA as Integer = TV_FIRST + 0
@@ -166,6 +173,12 @@ Implements WndProcSubclassWFS
 		    // our list
 		    if mItems = nil then mItems = new Dictionary
 		    mItems.Value( item.Handle ) = item
+		    
+		  #else
+		    
+		    #pragma unused item
+		    #pragma unused parent
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -173,6 +186,7 @@ Implements WndProcSubclassWFS
 	#tag Method, Flags = &h21
 		Private Sub BeginDrag(lpnmtreeview as MemoryBlock)
 		  #if TargetWin32
+		    
 		    // First, we want to make the proper image list for the drag item
 		    Dim TVM_CREATEDRAGIMAGE as Integer = TV_FIRST + 18
 		    Dim oldItemOffset as Integer = 16
@@ -200,6 +214,11 @@ Implements WndProcSubclassWFS
 		    // And capture all mouse movements in this window
 		    Declare Sub SetCapture Lib "User32" ( hwnd as Integer )
 		    SetCapture( mWnd )
+		    
+		  #else
+		    
+		    #pragma unused lpnmtreeview
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -224,6 +243,7 @@ Implements WndProcSubclassWFS
 	#tag Method, Flags = &h0
 		Sub Create(w as Window, x as Integer, y as Integer, width as Integer, height as Integer)
 		  #if TargetWin32
+		    
 		    Const WC_TREEVIEW = "SysTreeView32"
 		    
 		    Soft Declare Function CreateWindowExA Lib "User32" ( ex as Integer, className as CString, _
@@ -297,6 +317,15 @@ Implements WndProcSubclassWFS
 		    // for this window.  Be sure to keep the RB Window around tho
 		    WndProcHelpers.Subclass( w, self )
 		    mRBWindow = w
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused x
+		    #pragma unused y
+		    #pragma unused width
+		    #pragma unused height
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -330,14 +359,13 @@ Implements WndProcSubclassWFS
 
 	#tag Method, Flags = &h0
 		Sub EnsureItemIsVisible(item as TreeViewItemWFS)
-		  #if TargetWin32
-		    // We want to make sure this item is visible to the
-		    // user, and that all parents are properly expanded
-		    // to show the item
-		    Dim TVM_ENSUREVISIBLE as Integer = TV_FIRST + 20
-		    
-		    Call SendMessage( TVM_ENSUREVISIBLE, 0, item.Handle )
-		  #endif
+		  // We want to make sure this item is visible to the
+		  // user, and that all parents are properly expanded
+		  // to show the item
+		  Dim TVM_ENSUREVISIBLE as Integer = TV_FIRST + 20
+		  
+		  Call SendMessage( TVM_ENSUREVISIBLE, 0, item.Handle )
+		  
 		End Sub
 	#tag EndMethod
 
@@ -392,6 +420,7 @@ Implements WndProcSubclassWFS
 	#tag Method, Flags = &h21
 		Private Function HandleWM_MouseMove(lParam as Integer) As Integer
 		  #if TargetWin32
+		    
 		    // If we're not dragging, then we don't care
 		    if mDragging = 0 then return 0
 		    
@@ -427,6 +456,11 @@ Implements WndProcSubclassWFS
 		    
 		    // Now show the new image
 		    ImageList_DragShowNolock( true )
+		    
+		  #else
+		    
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -505,6 +539,10 @@ Implements WndProcSubclassWFS
 		  end
 		  
 		  return 0
+		  
+		  #pragma unused hWnd
+		  #pragma unused controlID
+		  
 		End Function
 	#tag EndMethod
 
@@ -614,51 +652,49 @@ Implements WndProcSubclassWFS
 
 	#tag Method, Flags = &h0
 		Sub RemoveAllItems()
-		  #if TargetWin32
-		    Dim TVM_DELETEITEM as Integer = TV_FIRST + 1
-		    Const TVI_ROOT                = &hFFFF0000
-		    Call SendMessage( TVM_DELETEITEM, 0, TVI_ROOT )
-		  #endif
+		  Dim TVM_DELETEITEM as Integer = TV_FIRST + 1
+		  Const TVI_ROOT                = &hFFFF0000
+		  
+		  Call SendMessage( TVM_DELETEITEM, 0, TVI_ROOT )
 		  mItems = nil
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub RemoveItem(item as TreeViewItemWFS)
-		  #if TargetWin32
-		    Dim TVM_DELETEITEM as Integer = TV_FIRST + 1
-		    
-		    Call SendMessage( TVM_DELETEITEM, 0, item.Handle )
-		    
-		    try
-		      mItems.Remove( item.Handle )
-		    catch
-		    end
-		  #endif
+		  Dim TVM_DELETEITEM as Integer = TV_FIRST + 1
+		  
+		  Call SendMessage( TVM_DELETEITEM, 0, item.Handle )
+		  
+		  try
+		    mItems.Remove( item.Handle )
+		  catch
+		  end
+		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SelectItem(item as TreeViewItemWFS)
-		  #if TargetWin32
-		    // We want to change the selection to the
-		    // proper item
-		    Dim TVM_SELECTITEM as Integer = TV_FIRST + 11
-		    Const TVGN_CARET = &h0009
-		    Const TVGN_DROPHILITE = &h0008
-		    
-		    // First set the caret
-		    Call SendMessage( TVM_SELECTITEM, TVGN_CARET, item.Handle )
-		    
-		    // Then set the highlight
-		    Call SendMessage( TVM_SELECTITEM, TVGN_DROPHILITE, item.Handle )
-		  #endif
+		  // We want to change the selection to the
+		  // proper item
+		  Dim TVM_SELECTITEM as Integer = TV_FIRST + 11
+		  Const TVGN_CARET = &h0009
+		  Const TVGN_DROPHILITE = &h0008
+		  
+		  // First set the caret
+		  Call SendMessage( TVM_SELECTITEM, TVGN_CARET, item.Handle )
+		  
+		  // Then set the highlight
+		  Call SendMessage( TVM_SELECTITEM, TVGN_DROPHILITE, item.Handle )
+		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function SendMessage(msg as Integer, wParam as Integer, lParam as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Soft Declare Function SendMessageA Lib "User32" ( wnd as Integer, msg as Integer, _
 		    wParam as Integer, lParam as Integer ) as Integer
 		    Soft Declare Function SendMessageW Lib "User32" ( wnd as Integer, msg as Integer, _
@@ -669,6 +705,13 @@ Implements WndProcSubclassWFS
 		    else
 		      return SendMessageA( mWnd, msg, wParam, lParam )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod
