@@ -3,26 +3,39 @@ WFS
 
 Windows Functionality Suite
 
-v2.6.1
-
-this is the code that Aaron Ballman originally wrote for REALBasic (which is now Xojo).  there have been other contributors over the years, if we can figure them out we will note them below.
-
-if you want to contribute to WFS, please submit a pull request.  we accept as just about all updates.
+The Windows Functionality Suite (previously known as the Win32 Declare Library) is a collection of Windows-specific functionality that is not readily available in a free format. It is an open source collaboration that brings to users all of the specialized Windows functionality that is not included with Xojo \ Real Studio itself.
 
 
-**Real Studio**
+**Version**
 
-* version 2011R1.1
+v2.7.0
 
-**repository locations**
+
+**Contribute**
+
+If you want to contribute to WFS, please submit a pull request.  We will accept just about all updates. Before you submit for a merge please increment the version number in README.md and VERSION.
+
+
+**Notes**
+
+This code was originally written by Aaron Ballman for REALBasic (which is now Xojo).  There have been other contributors over the years, if we can figure them out we will note them below.
+
+
+**Xojo \ Real Studio**
+
+* Version 2011R1.1
+
+
+**Repository Locations**
 
 * http://github.com/arbp/WFS (primary)
 * https://bitbucket.org/sboss/wfs (secondary)
 
-**contributors** (in no order)
+
+**Contributors** (in no order)
 
 * Aaron Ballman
-* scott boss
+* Scott Boss
 * François Van Lerberghe
 * Seth Willits
 * Stephen Tallent
@@ -42,3 +55,4 @@ if you want to contribute to WFS, please submit a pull request.  we accept as ju
 * Carlos Martinho
 * Alessandro Consorti
 * Kem Tekinay
+* Brandon Skrtich

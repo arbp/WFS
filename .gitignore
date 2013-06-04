@@ -1,0 +1,22 @@
+# Xojo Generated Files #
+########################
+*.app
+*.rbuistate
+*.xojo_uistate
+*Builds - *
+*.DS_Store
+*.obsolete
+*.obsolete_*
+Debug*.tar.gz
+
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
