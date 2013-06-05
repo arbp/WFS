@@ -44,6 +44,7 @@ Protected Module GraphicsHelpersWFS
 	#tag Method, Flags = &h1
 		Protected Function CaptureScreen(withCursor as Boolean = false) As Picture
 		  #if TargetWin32
+		    
 		    // DISCLAIMER!!!  READ THIS!!!!
 		    // The following declare uses a very unsupported feature in REALbasic.  This means a few
 		    // things.  1) Don't rely on this call working forever -- it's entirely possible that upgrading to
@@ -142,7 +143,13 @@ Protected Module GraphicsHelpersWFS
 		    end if
 		    
 		    return ret
+		    
+		  #else
+		    
+		    #pragma unused withCursor
+		    
 		  #endif
+		  
 		  return nil
 		End Function
 	#tag EndMethod
@@ -150,6 +157,7 @@ Protected Module GraphicsHelpersWFS
 	#tag Method, Flags = &h1
 		Protected Function ChooseFont(owner as Window = nil) As StyleRun
 		  #if TargetWin32
+		    
 		    Soft Declare Function ChooseFontA Lib "ComDlg32" ( lpcf as Ptr ) as Boolean
 		    Soft Declare Function ChooseFontW Lib "ComDlg32" ( lpcf as Ptr ) as Boolean
 		    Declare Function GetDC Lib "User32" ( hwnd as Integer ) as Integer
@@ -204,6 +212,11 @@ Protected Module GraphicsHelpersWFS
 		    ' Be sure to release the device context
 		    ReleaseDC( mb.Long( 8 ) )
 		    return nil
+		    
+		  #else
+		    
+		    #pragma unused owner
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -211,6 +224,7 @@ Protected Module GraphicsHelpersWFS
 	#tag Method, Flags = &h1
 		Protected Function ChooseLogicalFont(owner as Window = nil) As LogicalFontWFS
 		  #if TargetWin32
+		    
 		    Soft Declare Function ChooseFontA Lib "ComDlg32" ( lpcf as Ptr ) as Boolean
 		    Soft Declare Function ChooseFontW Lib "ComDlg32" ( lpcf as Ptr ) as Boolean
 		    Declare Function GetDC Lib "User32" ( hwnd as Integer ) as Integer
@@ -255,6 +269,11 @@ Protected Module GraphicsHelpersWFS
 		    ' Be sure to release the device context
 		    ReleaseDC( mb.Long( 8 ) )
 		    return nil
+		    
+		  #else
+		    
+		    #pragma unused owner
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -262,6 +281,7 @@ Protected Module GraphicsHelpersWFS
 	#tag Method, Flags = &h1
 		Protected Sub DialogUnitsToPixels(g as Graphics, ByRef top as Integer, ByRef left as Integer, ByRef width as Integer, ByRef height as Integer)
 		  #if TargetWin32
+		    
 		    // Get the HDC for the window's Graphics context
 		    dim handle as Integer = g.Handle( Graphics.HandleTypeHDC )
 		    
@@ -304,6 +324,15 @@ Protected Module GraphicsHelpersWFS
 		    left = (left * baseUnitX) / 4
 		    width = (width * baseUnitX) / 4
 		    height = (height * baseUnitY) / 8
+		    
+		  #else
+		    
+		    #pragma unused g
+		    #pragma unused top
+		    #pragma unused left
+		    #pragma unused width
+		    #pragma unused height
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -311,6 +340,7 @@ Protected Module GraphicsHelpersWFS
 	#tag Method, Flags = &h1
 		Protected Function GetStockIcon(id as Integer, smallIcon as Boolean = false, selected as Boolean = false, linkOverlay as Boolean = false) As Picture
 		  #if TargetWin32
+		    
 		    Soft Declare Sub SHGetStockIconInfo Lib "Shell32" ( id as Integer, flags as Integer, info as Ptr )
 		    Declare Sub DestroyIcon Lib "User32" (hIcon as Integer )
 		    
@@ -331,26 +361,44 @@ Protected Module GraphicsHelpersWFS
 		      
 		      return ret
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused id
+		    #pragma unused smallIcon
+		    #pragma unused selected
+		    #pragma unused linkOverlay
+		    
 		  #endif
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function GetTextCharset(g as Graphics) As Integer
-		  Declare Function GetTextCharset Lib "Gdi32" ( hdc as Integer ) as Integer
+		  #if TargetWin32
+		    
+		    Declare Function GetTextCharset Lib "Gdi32" ( hdc as Integer ) as Integer
+		    
+		    // Select the font into the Graphics object by making a
+		    // call to StringWidth.  This way, you can call this
+		    // function directly after setting the text font.
+		    call g.StringWidth( "X" )
+		    
+		    return GetTextCharset( g.Handle( Graphics.HandleTypeHDC ) )
+		    
+		  #else
+		    
+		    #pragma unused g
+		    
+		  #endif
 		  
-		  // Select the font into the Graphics object by making a
-		  // call to StringWidth.  This way, you can call this
-		  // function directly after setting the text font.
-		  call g.StringWidth( "X" )
-		  
-		  return GetTextCharset( g.Handle( Graphics.HandleTypeHDC ) )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function IconHandleToPicture(iconHandle as Integer) As Picture
 		  #if TargetWin32
+		    
 		    // DISCLAIMER!!!  READ THIS!!!!
 		    // The following declare uses a very unsupported feature in REALbasic.  This means a few
 		    // things.  1) Don't rely on this call working forever -- it's entirely possible that upgrading to
@@ -419,6 +467,11 @@ Protected Module GraphicsHelpersWFS
 		    DeleteDC( srchdc2 )
 		    
 		    return ret
+		    
+		  #else
+		    
+		    #pragma unused iconHandle
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -432,6 +485,7 @@ Protected Module GraphicsHelpersWFS
 	#tag Method, Flags = &h1
 		Protected Function LoadIcon(appInstance as FolderItem, iconNum as Integer = - 1) As Picture
 		  #if TargetWin32
+		    
 		    Soft Declare Function LoadImageA Lib "User32" ( instance as Integer, iconName as CString, type as Integer, _
 		    cxDesired as Integer, cyDesired as Integer, loadFlags as Integer ) as Integer
 		    Soft Declare Function LoadImageW Lib "User32" ( instance as Integer, iconName as WString, type as Integer, _
@@ -495,6 +549,12 @@ Protected Module GraphicsHelpersWFS
 		    DestroyIcon( iconHandle )
 		    
 		    return ret
+		    
+		  #else
+		    
+		    #pragma unused appInstance
+		    #pragma unused iconNum
+		    
 		  #endif
 		End Function
 	#tag EndMethod
