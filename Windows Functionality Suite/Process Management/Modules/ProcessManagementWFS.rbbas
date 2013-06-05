@@ -75,8 +75,8 @@ Protected Module ProcessManagementWFS
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
-		Function BringToFrontCallback(hwnd as Integer, cookie as Integer) As Boolean
+	#tag Method, Flags = &h1
+		Protected Function BringToFrontCallback(hwnd as Integer, cookie as Integer) As Boolean
 		  #if TargetWin32
 		    
 		    Declare Sub BringWindowToTop Lib "User32" ( hwnd as Integer )
@@ -116,9 +116,9 @@ Protected Module ProcessManagementWFS
 		      mb = new MemoryBlock( 260 + 36 )
 		    end if
 		    
-		    dim entry as ProcessInformation
+		    dim entry as ProcessInformationWFS
 		    dim err as Integer
-		    dim ret() as ProcessInformation
+		    dim ret() as ProcessInformationWFS
 		    
 		    mb.Long( 0 ) = mb.Size
 		    if unicodeSavvy then
@@ -130,7 +130,7 @@ Protected Module ProcessManagementWFS
 		    dim good as Boolean
 		    
 		    do
-		      entry = new ProcessInformation( mb, unicodeSavvy )
+		      entry = new ProcessInformationWFS( mb, unicodeSavvy )
 		      
 		      ret.Append( entry )
 		      
@@ -151,8 +151,8 @@ Protected Module ProcessManagementWFS
 		Protected Function GetActiveProcessNames() As String()
 		  #if TargetWin32
 		    dim ret() as String
-		    dim entries() as ProcessInformation
-		    dim entry as ProcessInformation
+		    dim entries() as ProcessInformationWFS
+		    dim entry as ProcessInformationWFS
 		    
 		    // Get all of the processes
 		    entries = GetActiveProcesses()
@@ -205,10 +205,10 @@ Protected Module ProcessManagementWFS
 		    
 		    // Now we get a list of all the processes, and see if we can find
 		    // one with a match.
-		    dim processes(-1) as ProcessInformation
+		    dim processes(-1) as ProcessInformationWFS
 		    processes = GetActiveProcesses
 		    
-		    dim ret as ProcessInformation
+		    dim ret as ProcessInformationWFS
 		    for each ret in processes
 		      if ret.ProcessID = processID then
 		        return ret

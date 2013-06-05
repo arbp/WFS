@@ -1,7 +1,7 @@
 #tag Module
 Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
-		Function Alpha(extends w as Window) As Single
+		Function AlphaWFS(extends w as Window) As Single
 		  #if TargetWin32
 		    
 		    Const LWA_ALPHA = 2
@@ -24,7 +24,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Alpha(extends w as Window, assigns alpha as Single)
+		Sub AlphaWFS(extends w as Window, assigns alpha as Single)
 		  #if TargetWin32
 		    
 		    // First, check to see if we've set this window up to be layered yet
@@ -56,7 +56,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub AnimateWindow(extends w as Window, microsecs as Integer, flags as Integer)
+		Sub AnimateWindowWFS(extends w as Window, microsecs as Integer, flags as Integer)
 		  'More info at http://www.developersdomain.com/vb/codesnippets/windows.htm
 		  #if TargetWin32 then
 		    
@@ -81,7 +81,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub BringToFront(extends w as Window)
+		Sub BringToFrontWFS(extends w as Window)
 		  #if TargetWin32
 		    
 		    Dim i, h, r As Integer
@@ -105,7 +105,7 @@ Protected Module WindowExtensionsWFS
 		    i = ShowWindow( h, 1 )
 		    i = BringWindowToTop( h )
 		    i = SetForegroundWindow( h )
-		    w.FlashWindowEx( 3 )
+		    w.FlashWindowExWFS( 3 )
 		    
 		  #else
 		    
@@ -116,7 +116,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub ChangeWindowState(extends wnd as Window, style as Integer)
+		Sub ChangeWindowStateWFS(extends wnd as Window, style as Integer)
 		  #if TargetWin32
 		    
 		    Declare Sub ShowWindow Lib "User32" (wnd As Integer, nCmdShow As Integer)
@@ -223,7 +223,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function CloseButtonState(extends w as Window) As Boolean
+		Function CloseButtonStateWFS(extends w as Window) As Boolean
 		  #if TargetWin32
 		    
 		    Declare Function GetSystemMenu Lib "User32" ( wnd as Integer, revert as Boolean ) as Integer
@@ -252,7 +252,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub CloseButtonState(extends w as Window, assigns enabled as Boolean)
+		Sub CloseButtonStateWFS(extends w as Window, assigns enabled as Boolean)
 		  #if TargetWin32
 		    
 		    Declare Function GetSystemMenu Lib "User32" ( wnd as Integer, revert as Boolean ) as Integer
@@ -293,25 +293,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub FlashWindow(Extends win as window)
-		  #if TargetWin32
-		    
-		    //works on windows 95+
-		    dim res as integer
-		    Declare Function FlashWindow Lib "user32" (hwnd As integer, bInvert As integer) As integer
-		    Const Invert = 1
-		    res = FlashWindow(win.winhwnd,Invert)
-		    
-		  #else
-		    
-		    #pragma unused win
-		    
-		  #endif
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub FlashWindowEx(Extends win as window, x as integer)
+		Sub FlashWindowExWFS(Extends win as window, x as integer)
 		  #if TargetWin32
 		    
 		    //requires windows 98 or higher
@@ -355,7 +337,25 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub FreezeUpdate(extends w as Window)
+		Sub FlashWindowWFS(Extends win as window)
+		  #if TargetWin32
+		    
+		    //works on windows 95+
+		    dim res as integer
+		    Declare Function FlashWindow Lib "user32" (hwnd As integer, bInvert As integer) As integer
+		    Const Invert = 1
+		    res = FlashWindow(win.winhwnd,Invert)
+		    
+		  #else
+		    
+		    #pragma unused win
+		    
+		  #endif
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub FreezeUpdateWFS(extends w as Window)
 		  #if TargetWin32
 		    
 		    // This is incorrect and should only be used for drag and drop operations
@@ -404,7 +404,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function HasBorder(extends w as Window) As Boolean
+		Function HasBorderWFS(extends w as Window) As Boolean
 		  Const WS_BORDER = &H800000
 		  
 		  return TestWindowStyle( w, WS_BORDER )
@@ -412,14 +412,14 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub HasBorder(extends w as Window, assigns border as Boolean)
+		Sub HasBorderWFS(extends w as Window, assigns border as Boolean)
 		  Const WS_BORDER = &H800000
 		  ChangeWindowStyle( w, WS_BORDER, border )
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function HasMaximizeButton(extends w as Window) As Boolean
+		Function HasMaximizeButtonWFS(extends w as Window) As Boolean
 		  Const WS_MAXIMIZEBOX = &h00010000
 		  
 		  return TestWindowStyle( w, WS_MAXIMIZEBOX )
@@ -427,7 +427,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub HasMaximizeButton(extends w as Window, assigns set as Boolean)
+		Sub HasMaximizeButtonWFS(extends w as Window, assigns set as Boolean)
 		  Const WS_MAXIMIZEBOX = &h00010000
 		  
 		  ChangeWindowStyle( w, WS_MAXIMIZEBOX, set )
@@ -435,7 +435,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function HasMinimizeButton(extends w as Window) As Boolean
+		Function HasMinimizeButtonWFS(extends w as Window) As Boolean
 		  Const WS_MINIMIZEBOX = &h00020000
 		  
 		  return TestWindowStyle( w, WS_MINIMIZEBOX )
@@ -443,7 +443,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub HasMinimizeButton(extends w as Window, assigns set as Boolean)
+		Sub HasMinimizeButtonWFS(extends w as Window, assigns set as Boolean)
 		  Const WS_MINIMIZEBOX = &h00020000
 		  
 		  ChangeWindowStyle( w, WS_MINIMIZEBOX, set )
@@ -451,7 +451,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function HasSystemMenu(extends w as Window) As Boolean
+		Function HasSystemMenuWFS(extends w as Window) As Boolean
 		  Const WS_SYSMENU = &h00080000
 		  
 		  return TestWindowStyle( w, WS_SYSMENU )
@@ -459,7 +459,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub HasSystemMenu(extends w as Window, assigns set as Boolean)
+		Sub HasSystemMenuWFS(extends w as Window, assigns set as Boolean)
 		  Const WS_SYSMENU = &h00080000
 		  
 		  ChangeWindowStyle( w, WS_SYSMENU, set )
@@ -467,7 +467,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function HasTitleBar(extends w as Window) As Boolean
+		Function HasTitleBarWFS(extends w as Window) As Boolean
 		  Const WS_CAPTION = &h00C00000
 		  
 		  return TestWindowStyle( w, WS_CAPTION )
@@ -475,7 +475,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub HasTitleBar(extends w as Window, assigns set as Boolean)
+		Sub HasTitleBarWFS(extends w as Window, assigns set as Boolean)
 		  Const WS_CAPTION = &h00C00000
 		  
 		  ChangeWindowStyle( w, WS_CAPTION, set )
@@ -572,7 +572,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Icon(extends w as Window, assigns newIcon as Picture)
+		Sub IconWFS(extends w as Window, assigns newIcon as Picture)
 		  // We want to set the new icon for this window
 		  Const WM_SETICON = &h80
 		  Const ICON_SMALL = 0
@@ -608,7 +608,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function IsMaximized(extends w as Window) As Boolean
+		Function IsMaximizedWFS(extends w as Window) As Boolean
 		  #if TargetWin32
 		    
 		    Declare Function IsZoomed Lib "User32" ( hwnd As Integer ) As Integer
@@ -624,7 +624,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function IsMinimized(extends w as Window) As Boolean
+		Function IsMinimizedWFS(extends w as Window) As Boolean
 		  #if TargetWin32
 		    
 		    Declare Function IsIconic Lib "User32" ( hwnd As Integer ) As Integer
@@ -640,14 +640,14 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function IsToolbarWindow(extends w as Window) As Boolean
+		Function IsToolbarWindowWFS(extends w as Window) As Boolean
 		  Const WS_EX_TOOLWINDOW = &h00000080
 		  return TestWindowStyleEx( w, WS_EX_TOOLWINDOW )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub IsToolbarWindow(extends w as Window, assigns set as Boolean)
+		Sub IsToolbarWindowWFS(extends w as Window, assigns set as Boolean)
 		  Const WS_EX_TOOLWINDOW = &h00000080
 		  
 		  ChangeWindowStyleEx( w, WS_EX_TOOLWINDOW, set )
@@ -655,7 +655,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function Mask(extends w as Window) As Color
+		Function MaskWFS(extends w as Window) As Color
 		  #if TargetWin32
 		    
 		    Const LWA_COLOR_KEY = 2
@@ -677,7 +677,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Mask(extends w as Window, assigns c as Color)
+		Sub MaskWFS(extends w as Window, assigns c as Color)
 		  // First, check to see if we've set this window up to be layered yet
 		  Const WS_EX_LAYERED = 524288 //2^19
 		  Const LWA_COLORKEY = 1
@@ -705,7 +705,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function Resizable(extends w as Window) As Boolean
+		Function ResizableWFS(extends w as Window) As Boolean
 		  Const WS_SIZEBOX = &h00040000
 		  
 		  return TestWindowStyle( w, WS_SIZEBOX )
@@ -713,7 +713,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Resizable(extends w as Window, assigns set as Boolean)
+		Sub ResizableWFS(extends w as Window, assigns set as Boolean)
 		  Const WS_SIZEBOX = &h00040000
 		  
 		  ChangeWindowStyle( w, WS_SIZEBOX, set )
@@ -824,14 +824,14 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function Topmost(extends w as Window) As Boolean
+		Function TopmostWFS(extends w as Window) As Boolean
 		  Const WS_EX_TOPMOST = &h00000008
 		  return TestWindowStyleEx( w, WS_EX_TOPMOST )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Topmost(extends w as Window, assigns set as Boolean)
+		Sub TopmostWFS(extends w as Window, assigns set as Boolean)
 		  #if TargetWin32
 		    
 		    Const WS_EX_TOPMOST = &h00000008
@@ -863,7 +863,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function TrueBottom(extends w as Window) As Integer
+		Function TrueBottomWFS(extends w as Window) As Integer
 		  dim top, left, right, bottom as Integer
 		  GetWindowRect( w, left, top, right, bottom )
 		  
@@ -872,7 +872,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function TrueLeft(extends w as Window) As Integer
+		Function TrueLeftWFS(extends w as Window) As Integer
 		  dim top, left, right, bottom as Integer
 		  GetWindowRect( w, left, top, right, bottom )
 		  
@@ -881,13 +881,13 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub TrueLeft(extends w as Window, assigns s as Integer)
-		  SetWindowPos( w, s, w.TrueTop )
+		Sub TrueLeftWFS(extends w as Window, assigns s as Integer)
+		  SetWindowPos( w, s, w.TrueTopWFS )
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function TrueRight(extends w as Window) As Integer
+		Function TrueRightWFS(extends w as Window) As Integer
 		  dim top, left, right, bottom as Integer
 		  GetWindowRect( w, left, top, right, bottom )
 		  
@@ -896,7 +896,7 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function TrueTop(extends w as Window) As Integer
+		Function TrueTopWFS(extends w as Window) As Integer
 		  dim top, left, right, bottom as Integer
 		  GetWindowRect( w, left, top, right, bottom )
 		  
@@ -905,13 +905,13 @@ Protected Module WindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub TrueTop(extends w as Window, assigns s as Integer)
-		  SetWindowPos( w, w.TrueLeft, s )
+		Sub TrueTopWFS(extends w as Window, assigns s as Integer)
+		  SetWindowPos( w, w.TrueLeftWFS, s )
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub UnfreezeUpdate(extends w as Window)
+		Sub UnfreezeUpdateWFS(extends w as Window)
 		  #if TargetWin32
 		    
 		    // This is incorrect and should only be used for drag and drop operations

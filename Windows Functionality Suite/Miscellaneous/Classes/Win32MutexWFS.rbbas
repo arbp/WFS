@@ -62,7 +62,7 @@ Protected Class Win32MutexWFS
 		    if mHandle = 0 then
 		      return false
 		    else
-		      error = Win32DeclareLibrary.GetLastError
+		      error = Win32DeclareLibraryWFS.GetLastError
 		      if error = ERROR_ALREADY_EXISTS then
 		        return false
 		      end

@@ -429,7 +429,7 @@ Protected Module CryptographyWFS
 		      end if
 		      
 		      if ret = 0 then
-		        MsgBox "0x" + Hex( Win32DeclareLibrary.GetLastError )
+		        MsgBox "0x" + Hex( Win32DeclareLibraryWFS.GetLastError )
 		        // We really can't do anything right, can we?
 		        return false
 		      end if

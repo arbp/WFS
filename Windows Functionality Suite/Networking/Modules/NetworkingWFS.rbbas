@@ -153,27 +153,37 @@ Protected Module NetworkingWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub TransmitFile(extends tcp as TCPSocket, bs as BinaryStream)
-		  Soft Declare Sub TransmitFile Lib "mswsock" ( socket as Integer, file as Integer, _
-		  bytesToWrite as Integer, bytesPerSend as Integer, _
-		  overlapped as Integer, transmitBuffers as Integer, flags as Integer )
+		Sub TransmitFileWFS(extends tcp as TCPSocket, bs as BinaryStream)
+		  #if TargetWin32
+		    
+		    Soft Declare Sub TransmitFile Lib "mswsock" ( socket as Integer, file as Integer, _
+		    bytesToWrite as Integer, bytesPerSend as Integer, _
+		    overlapped as Integer, transmitBuffers as Integer, flags as Integer )
+		    
+		    if System.IsFunctionAvailable( "TransmitFile", "mswsock" ) then
+		      Const TF_WRITE_BEHIND = &h4
+		      Const TF_USE_SYSTEM_THREAD = &h10
+		      Const TF_DISCONNECT = &h1
+		      
+		      if bs = nil then return
+		      
+		      TransmitFile( tcp.Handle, _
+		      bs.Handle( BinaryStream.HandleTypeWin32Handle ), 0, 0, 0, 0, _
+		      TF_WRITE_BEHIND + TF_USE_SYSTEM_THREAD )
+		      
+		      // Note that we have to keep bs open because the thread is going
+		      // to send the file asynchronously.  This makes things kind of tough
+		      // since there's also no notification of when the file can safely be closed
+		      // either.
+		    end if
+		    
+		  #else
+		    
+		    #pragma unused tcp
+		    #pragma unused bs
+		    
+		  #endif
 		  
-		  if System.IsFunctionAvailable( "TransmitFile", "mswsock" ) then
-		    Const TF_WRITE_BEHIND = &h4
-		    Const TF_USE_SYSTEM_THREAD = &h10
-		    Const TF_DISCONNECT = &h1
-		    
-		    if bs = nil then return
-		    
-		    TransmitFile( tcp.Handle, _
-		    bs.Handle( BinaryStream.HandleTypeWin32Handle ), 0, 0, 0, 0, _
-		    TF_WRITE_BEHIND + TF_USE_SYSTEM_THREAD )
-		    
-		    // Note that we have to keep bs open because the thread is going
-		    // to send the file asynchronously.  This makes things kind of tough
-		    // since there's also no notification of when the file can safely be closed
-		    // either.
-		  end if
 		End Sub
 	#tag EndMethod
 
