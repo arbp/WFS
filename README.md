@@ -8,7 +8,7 @@ The Windows Functionality Suite (previously known as the Win32 Declare Library) 
 
 **Version**
 
-v2.7.1
+v2.7.2
 
 
 **Contribute**

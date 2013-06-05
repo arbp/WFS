@@ -22,6 +22,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowActiveDesktop(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -34,6 +35,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoActiveDesktopChanges" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -63,6 +69,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowChangeStartMenu(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -75,6 +82,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoChangeStartMenu" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -104,6 +116,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowCloseLogoff(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -116,6 +129,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoLogoff" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -145,6 +163,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowControlPanels(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -161,6 +180,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoDispCpl" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -190,6 +214,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowDesktop(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -202,6 +227,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoDesktop" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -212,6 +242,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Function AllowDrive(driveNum as Integer) As Boolean
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -227,6 +258,11 @@ Protected Module RegistryWFS
 		    end
 		    
 		    return BitwiseAnd( oldMask, Pow( 2, driveNum ) ) = 0
+		    
+		  #else
+		    
+		    #pragma unused driveNum
+		    
 		  #endif
 		  
 		exception
@@ -237,6 +273,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowDrive(driveNum as Integer, assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -258,6 +295,12 @@ Protected Module RegistryWFS
 		    end
 		    
 		    policies.Value( "NoDrives" ) = oldMask
+		    
+		  #else
+		    
+		    #pragma unused driveNum
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -287,6 +330,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowFavoritesMenu(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -299,6 +343,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoFavoritesMenu" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -328,6 +377,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowFileAssociate(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -340,6 +390,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoFileAssociate" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -369,6 +424,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowFind(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -381,6 +437,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoFind" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -410,6 +471,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowFolderOptions(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -422,6 +484,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoFolderOptions" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -451,6 +518,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowInternetIcon(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -463,6 +531,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoInternetIcon" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -492,6 +565,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowRecentDocumentsMenu(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -504,6 +578,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoRecentDocsMenu" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -533,6 +612,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowRegistryTools(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -549,6 +629,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "DisableRegistryTools" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -578,6 +663,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowRunMenu(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -590,6 +676,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoRun" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -619,6 +710,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowSpecialFolders(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -631,6 +723,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoSetFolders" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -660,6 +757,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowTaskbarBands(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -672,6 +770,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoMovingBands" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -701,6 +804,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowTaskbarProperties(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -713,6 +817,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoSetTaskbar" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -742,6 +851,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowTaskManager(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -758,6 +868,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "DisableTaskMgr" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -787,6 +902,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub AllowTrayContextMenu(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -799,6 +915,11 @@ Protected Module RegistryWFS
 		    if not set then setInt = 1
 		    
 		    policies.Value( "NoTrayContextMenu" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -828,6 +949,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Sub ClearRecentDocsOnExit(assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim policies as RegistryItem
 		    
 		    policies = CurrentUsersPolicies
@@ -840,6 +962,11 @@ Protected Module RegistryWFS
 		    if set then setInt = 1
 		    
 		    policies.Value( "ClearRecentDocsOnExit" ) = setInt
+		    
+		  #else
+		    
+		    #pragma unused set
+		    
 		  #endif
 		  
 		exception
@@ -907,6 +1034,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Function GetCPUIdentifier(ProcessorNumber as Integer) As String
 		  #if TargetWin32 then
+		    
 		    Dim cpuInfo As String
 		    
 		    dim reg as new RegistryItem( "HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\" + _
@@ -917,6 +1045,11 @@ Protected Module RegistryWFS
 		    end if
 		    
 		    Return cpuInfo
+		    
+		  #else
+		    
+		    #pragma unused ProcessorNumber
+		    
 		  #endif
 		  
 		End Function
@@ -925,6 +1058,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Function GetCPUName(ProcessorNumber as Integer) As String
 		  #if TargetWin32 then
+		    
 		    Dim cpuInfo As String
 		    
 		    dim reg as new RegistryItem( "HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\" + _
@@ -935,6 +1069,11 @@ Protected Module RegistryWFS
 		    end if
 		    
 		    Return cpuInfo
+		    
+		  #else
+		    
+		    #pragma unused ProcessorNumber
+		    
 		  #endif
 		  
 		End Function
@@ -943,6 +1082,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Function GetCPUSpeed(ProcessorNumber as Integer) As String
 		  #if TargetWin32 then
+		    
 		    Dim cpuSpeed As String
 		    
 		    dim reg as new RegistryItem( "HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\" + _
@@ -954,6 +1094,11 @@ Protected Module RegistryWFS
 		    end if
 		    
 		    Return cpuSpeed
+		    
+		  #else
+		    
+		    #pragma unused ProcessorNumber
+		    
 		  #endif
 		  
 		End Function
@@ -962,6 +1107,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Function GetCPUType() As String
 		  #if TargetWin32
+		    
 		    Declare Sub GetSystemInfo Lib "Kernel32" ( info as Ptr )
 		    
 		    dim info as new MemoryBlock( 9 * 4 )
@@ -1059,6 +1205,7 @@ Protected Module RegistryWFS
 	#tag Method, Flags = &h1
 		Protected Function GetCPUVendor(ProcessorNumber as Integer) As String
 		  #if TargetWin32 then
+		    
 		    Dim cpuInfo As String
 		    
 		    dim reg as new RegistryItem( "HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\" + _
@@ -1069,6 +1216,11 @@ Protected Module RegistryWFS
 		    end if
 		    
 		    Return cpuInfo
+		    
+		  #else
+		    
+		    #pragma unused ProcessorNumber
+		    
 		  #endif
 		  
 		End Function

@@ -3,6 +3,7 @@ Protected Class ErrorReportWFS
 	#tag Method, Flags = &h0
 		Sub AddDump(type as Integer, flags as Integer)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub WerReportAddDump Lib "Wer" ( handle as Integer, processHandle as Integer, threadHandle as Integer, _
 		    type as Integer, exceptionInfo as Integer, customOptions as Integer, flags as Integer )
 		    
@@ -22,6 +23,12 @@ Protected Class ErrorReportWFS
 		      // Now we can add the dump
 		      WerReportAddDump( mHandle, processHandle, threadHandle, type, 0, 0, flags )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused type
+		    #pragma unused flags
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -29,11 +36,19 @@ Protected Class ErrorReportWFS
 	#tag Method, Flags = &h0
 		Sub AddFile(f as FolderItem, type as Integer, flags as Integer)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub WerReportAddFile Lib "Wer" ( handle as Integer, path as WString, type as Integer, flags as Integer )
 		    
 		    if System.IsFunctionAvailable( "WerReportAddFile", "Wer" ) and mHandle <> 0 then
 		      WerReportAddFile( mHandle, f.AbsolutePath, type, flags )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused type
+		    #pragma unused flags
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -41,11 +56,18 @@ Protected Class ErrorReportWFS
 	#tag Method, Flags = &h0
 		Sub Constructor(eventType as String, reportType as Integer)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub WerReportCreate Lib "Wer" ( eventType as WString, reportType as Integer, reportInfo as Integer, ByRef handle as Integer )
 		    
 		    if System.IsFunctionAvailable( "WerReportCreate", "Wer" ) then
 		      WerReportCreate( eventType, reportType, 0, mHandle )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused eventType
+		    #pragma unused reportType
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -65,11 +87,19 @@ Protected Class ErrorReportWFS
 	#tag Method, Flags = &h0
 		 Shared Sub RegisterFile(f as FolderItem, type as Integer, flags as Integer)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub WerRegisterFile Lib "Wer" ( path as WString, type as Integer, flags as Integer )
 		    
 		    if System.IsFunctionAvailable( "WerRegisterFile", "Wer" ) then
 		      WerRegisterFile( f.AbsolutePath, type, flags )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused type
+		    #pragma unused flags
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -77,11 +107,17 @@ Protected Class ErrorReportWFS
 	#tag Method, Flags = &h0
 		 Shared Sub RegisterMemoryBlock(mb as MemoryBlock)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub WerRegisterMemoryBlock Lib "Wer" ( block as Ptr, size as Integer )
 		    
 		    if System.IsFunctionAvailable( "WerRegisterMemoryBlock", "Wer" ) then
 		      WerRegisterMemoryBlock( mb, mb.Size )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused mb
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -89,6 +125,7 @@ Protected Class ErrorReportWFS
 	#tag Method, Flags = &h0
 		Function Send(consent as Integer, flags as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Soft Declare Sub WerReportSubmit Lib "Wer" ( handle as Integer, consent as Integer, flags as Integer, ByRef result as Integer )
 		    
 		    if System.IsFunctionAvailable( "WerReportSubmit", "Wer" ) then
@@ -98,6 +135,12 @@ Protected Class ErrorReportWFS
 		        return ret
 		      end if
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused consent
+		    #pragma unused flags
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -110,6 +153,12 @@ Protected Class ErrorReportWFS
 		    if System.IsFunctionAvailable( "WerReportSetUIOption", "Wer" ) and mHandle <> 0 then
 		      WerReportSetUIOption( mHandle, option, text )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused option
+		    #pragma unused text
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

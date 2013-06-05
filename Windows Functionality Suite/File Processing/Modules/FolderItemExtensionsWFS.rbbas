@@ -4,6 +4,7 @@ Protected Module FolderItemExtensionsWFS
 		Sub AddToRecentItems(extends f as FolderItem)
 		  // We want to add this folder item to the recent docs menu
 		  #if TargetWin32
+		    
 		    Soft Declare Sub SHAddToRecentDocs Lib "Shell32" ( type as Integer, path as Ptr )
 		    
 		    Const SHARED_PATHA = 2
@@ -24,6 +25,11 @@ Protected Module FolderItemExtensionsWFS
 		      
 		      SHAddToRecentDocs( type, path )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -113,6 +119,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Sub CopyMoveOp(fromFile as FolderItem, toFile as FolderItem, move as Boolean)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub SHFileOperationW Lib "Shell32" ( op as Ptr )
 		    Soft Declare Sub SHFileOperationA Lib "Shell32" ( op as Ptr )
 		    
@@ -175,6 +182,13 @@ Protected Module FolderItemExtensionsWFS
 		    else
 		      SHFileOperationA( mb )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused fromFile
+		    #pragma unused toFile
+		    #pragma unused move
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -184,6 +198,7 @@ Protected Module FolderItemExtensionsWFS
 		  if item = nil then return
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Sub DecryptFileA Lib "AdvApi32" ( file as CString, zero as Integer )
 		    Soft Declare Sub DecryptFileW Lib "AdvApi32" ( file as WString, zero as Integer )
 		    
@@ -192,6 +207,7 @@ Protected Module FolderItemExtensionsWFS
 		    else
 		      DecryptFileA( item.AbsolutePath, 0 )
 		    end if
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -201,6 +217,7 @@ Protected Module FolderItemExtensionsWFS
 		  if f is nil then return
 		  
 		  #if TargetWin32 then
+		    
 		    Const MOVEFILE_DELAY_UNTIL_REBOOT = &H4
 		    Soft Declare Sub MoveFileExW Lib "Kernel32"( OldFilename As WString, NewFileName As Integer, nWord As Integer )
 		    Soft Declare Sub MoveFileExA Lib "Kernel32"( OldFilename As CString, NewFileName As Integer, nWord As Integer )
@@ -210,6 +227,11 @@ Protected Module FolderItemExtensionsWFS
 		    else
 		      MoveFileExA( ConvertEncoding( f.AbsolutePath, Encodings.SystemDefault ), 0, MOVEFILE_DELAY_UNTIL_REBOOT )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -245,6 +267,7 @@ Protected Module FolderItemExtensionsWFS
 		  '// 05/17/2007
 		  
 		  #if TargetWin32 then
+		    
 		    while f.Parent <> nil
 		      f = f.Parent
 		    wend
@@ -263,6 +286,11 @@ Protected Module FolderItemExtensionsWFS
 		    if updateIcon and System.IsFunctionAvailable( "SHUpdateRecycleBinIcon", "shell32" ) then
 		      Call SHUpdateRecycleBinIcon
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -287,6 +315,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag Method, Flags = &h0
 		Function GetShortPath(extends f as FolderItem) As string
 		  #if TargetWin32
+		    
 		    /// This takes a long path and returns the truncated path
 		    /// for example GetShortPath("c:\program files")  will return C:\progra~1
 		    /// useful in shells and other places where spaces in paths are hard to deal with
@@ -305,6 +334,11 @@ Protected Module FolderItemExtensionsWFS
 		      
 		      if res > 0 then return TruncatedPath.CString( 0 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -316,6 +350,7 @@ Protected Module FolderItemExtensionsWFS
 		  '// 05/17/2007
 		  
 		  #if TargetWin32 then
+		    
 		    while f.Parent <> nil
 		      f = f.Parent
 		    wend
@@ -337,6 +372,11 @@ Protected Module FolderItemExtensionsWFS
 		    end if
 		    
 		    return -1
+		    
+		  #else
+		    
+		    #pragma unused f
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -348,6 +388,7 @@ Protected Module FolderItemExtensionsWFS
 		  '// 05/17/2007
 		  
 		  #if TargetWin32 then
+		    
 		    while f.Parent <> nil
 		      f = f.Parent
 		    wend
@@ -367,240 +408,254 @@ Protected Module FolderItemExtensionsWFS
 		    if x = 0 then
 		      return newInfo.Int64Value( 4 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    
 		  #endif
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Function GetVersionInformation(extends f as FolderItem) As VersionInformationWFS
-		  Soft Declare Function GetFileVersionInfoA lib "Version" ( fileName as CString, ignored as Integer, len as Integer, buffer as Ptr) as Boolean
-		  Soft Declare Function GetFileVersionInfoW lib "Version" ( fileName as WString, ignored as Integer, len as Integer, buffer as Ptr) as Boolean
-		  Soft Declare Function GetFileVersionInfoSizeA lib "Version" ( fileName as CString, ByRef ignored as Integer ) as Integer
-		  Soft Declare Function GetFileVersionInfoSizeW lib "Version" ( fileName as WString, ByRef ignored as Integer ) as Integer
-		  Soft Declare Function VerQueryValueA lib "Version" ( info as Ptr, subBlock as CString, value as Ptr, ByRef len as Integer ) as Boolean
-		  Soft Declare Function VerQueryValueW lib "Version" ( info as Ptr, subBlock as WString, value as Ptr, ByRef len as Integer ) as Boolean
-		  
-		  dim isUnicode as Boolean = System.IsFunctionAvailable( "GetFileVersionInfoW", "Version" )
-		  
-		  // First, get the size of the version information
-		  dim size as Integer
-		  if isUnicode then
-		    dim ignored as Integer
-		    size = GetFileVersionInfoSizeW( f.AbsolutePath, ignored )
-		  else
-		    dim ignored as Integer
-		    size = GetFileVersionInfoSizeA( ConvertEncoding( f.AbsolutePath, Encodings.SystemDefault ), ignored )
-		  end if
-		  
-		  // If our size is legit, then we know how much data to allocate
-		  if size = 0 then return nil
-		  
-		  // Allocate a buffer big enough to fit all of our data
-		  dim buffer as new MemoryBlock( size )
-		  
-		  // Now obtain the data itself
-		  dim success as Boolean
-		  if isUnicode then
-		    success = GetFileVersionInfoW( f.AbsolutePath, 0, size, buffer )
-		  else
-		    success = GetFileVersionInfoA( ConvertEncoding( f.AbsolutePath, Encodings.SystemDefault ), 0, size, buffer )
-		  end if
-		  
-		  // If we couldn't get the data, then bail out
-		  if not success then return nil
-		  
-		  // Now we want to find the language and code page information
-		  dim langInfoPtr as new MemoryBlock( 4 )
-		  dim langInfoLen as Integer
-		  if isUnicode then
-		    success = VerQueryValueW( buffer, "\VarFileInfo\Translation", langInfoPtr, langInfoLen )
-		  else
-		    success = VerQueryValueA( buffer, "\VarFileInfo\Translation", langInfoPtr, langInfoLen )
-		  end if
-		  
-		  dim langCodePage as String
-		  if not success then
-		    // It's possible that there's no translation table, in which case we will just
-		    // fake it by using the system's language and code page ID's.  According to
-		    // MSDN, the Translation table should always be present and always provide
-		    // you with correct information.  However, I've found that some linkers decide
-		    // to exclude this information, such as CodeWarrior.  Yee haw.  So if we can't
-		    // find the translation table, then we want to do some jiggery to find the first
-		    // language and code page that's in the structure.
-		    langCodePage = DoVersionJiggery( buffer )
-		  else
-		    // Now that we have language and codepage information, we want to
-		    // find the language and codepage that match the user's
-		    langCodePage = PadHexToFourDigits( langInfoPtr.Ptr( 0 ).Short( 0 ) ) + _
-		    PadHexToFourDigits( langInfoPtr.Ptr( 0 ).Short( 2 ) )
-		  end if
-		  
-		  dim data as new MemoryBlock( 4 )
-		  dim ret as new VersionInformationWFS
-		  dim len as Integer
-		  
-		  // Grab all the info we can
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\Comments", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.Comments = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\Comments", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.Comments = mb.CString( 0 )
+		  #if TargetWin32
+		    
+		    Soft Declare Function GetFileVersionInfoA lib "Version" ( fileName as CString, ignored as Integer, len as Integer, buffer as Ptr) as Boolean
+		    Soft Declare Function GetFileVersionInfoW lib "Version" ( fileName as WString, ignored as Integer, len as Integer, buffer as Ptr) as Boolean
+		    Soft Declare Function GetFileVersionInfoSizeA lib "Version" ( fileName as CString, ByRef ignored as Integer ) as Integer
+		    Soft Declare Function GetFileVersionInfoSizeW lib "Version" ( fileName as WString, ByRef ignored as Integer ) as Integer
+		    Soft Declare Function VerQueryValueA lib "Version" ( info as Ptr, subBlock as CString, value as Ptr, ByRef len as Integer ) as Boolean
+		    Soft Declare Function VerQueryValueW lib "Version" ( info as Ptr, subBlock as WString, value as Ptr, ByRef len as Integer ) as Boolean
+		    
+		    dim isUnicode as Boolean = System.IsFunctionAvailable( "GetFileVersionInfoW", "Version" )
+		    
+		    // First, get the size of the version information
+		    dim size as Integer
+		    if isUnicode then
+		      dim ignored as Integer
+		      size = GetFileVersionInfoSizeW( f.AbsolutePath, ignored )
+		    else
+		      dim ignored as Integer
+		      size = GetFileVersionInfoSizeA( ConvertEncoding( f.AbsolutePath, Encodings.SystemDefault ), ignored )
 		    end if
 		    
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\CompanyName", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.CompanyName = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\CompanyName", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.CompanyName = mb.CString( 0 )
+		    // If our size is legit, then we know how much data to allocate
+		    if size = 0 then return nil
+		    
+		    // Allocate a buffer big enough to fit all of our data
+		    dim buffer as new MemoryBlock( size )
+		    
+		    // Now obtain the data itself
+		    dim success as Boolean
+		    if isUnicode then
+		      success = GetFileVersionInfoW( f.AbsolutePath, 0, size, buffer )
+		    else
+		      success = GetFileVersionInfoA( ConvertEncoding( f.AbsolutePath, Encodings.SystemDefault ), 0, size, buffer )
 		    end if
 		    
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\FileDescription", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.FileDescription = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\FileDescription", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.FileDescription = mb.CString( 0 )
+		    // If we couldn't get the data, then bail out
+		    if not success then return nil
+		    
+		    // Now we want to find the language and code page information
+		    dim langInfoPtr as new MemoryBlock( 4 )
+		    dim langInfoLen as Integer
+		    if isUnicode then
+		      success = VerQueryValueW( buffer, "\VarFileInfo\Translation", langInfoPtr, langInfoLen )
+		    else
+		      success = VerQueryValueA( buffer, "\VarFileInfo\Translation", langInfoPtr, langInfoLen )
 		    end if
 		    
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\FileVersion", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.FileVersion = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\FileVersion", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.FileVersion = mb.CString( 0 )
-		    end if
-		    
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\InternalName", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.InternalName = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\InternalName", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.InternalName = mb.CString( 0 )
+		    dim langCodePage as String
+		    if not success then
+		      // It's possible that there's no translation table, in which case we will just
+		      // fake it by using the system's language and code page ID's.  According to
+		      // MSDN, the Translation table should always be present and always provide
+		      // you with correct information.  However, I've found that some linkers decide
+		      // to exclude this information, such as CodeWarrior.  Yee haw.  So if we can't
+		      // find the translation table, then we want to do some jiggery to find the first
+		      // language and code page that's in the structure.
+		      langCodePage = DoVersionJiggery( buffer )
+		    else
+		      // Now that we have language and codepage information, we want to
+		      // find the language and codepage that match the user's
+		      langCodePage = PadHexToFourDigits( langInfoPtr.Ptr( 0 ).Short( 0 ) ) + _
+		      PadHexToFourDigits( langInfoPtr.Ptr( 0 ).Short( 2 ) )
 		    end if
 		    
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\LegalCopyright", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.LegalCopyright = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\LegalCopyright", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.LegalCopyright = mb.CString( 0 )
-		    end if
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\LegalTrademarks", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.LegalTrademarks = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\LegalTrademarks", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.LegalTrademarks = mb.CString( 0 )
+		    dim data as new MemoryBlock( 4 )
+		    dim ret as new VersionInformationWFS
+		    dim len as Integer
+		    
+		    // Grab all the info we can
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\Comments", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.Comments = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\Comments", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.Comments = mb.CString( 0 )
+		      end if
+		      
 		    end if
 		    
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\OriginalFilename", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.OriginalFilename = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\OriginalFilename", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.OriginalFilename = mb.CString( 0 )
-		    end if
-		    
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\ProductName", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.ProductName = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\ProductName", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.ProductName = mb.CString( 0 )
-		    end if
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\ProductVersion", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.ProductVersion = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\ProductVersion", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.ProductVersion = mb.WString( 0 )
-		    end if
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\PrivateBuild", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.PrivateBuild = mb.WString( 0 )
-		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\PrivateBuild", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.PrivateBuild = mb.CString( 0 )
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\CompanyName", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.CompanyName = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\CompanyName", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.CompanyName = mb.CString( 0 )
+		      end if
+		      
 		    end if
 		    
-		  end if
-		  
-		  if isUnicode then
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\SpecialBuild", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.SpecialBuild = mb.WString( 0 )
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\FileDescription", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.FileDescription = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\FileDescription", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.FileDescription = mb.CString( 0 )
+		      end if
+		      
 		    end if
-		  else
-		    if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\SpecialBuild", data, len ) then
-		      dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
-		      ret.SpecialBuild = mb.CString( 0 )
+		    
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\FileVersion", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.FileVersion = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\FileVersion", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.FileVersion = mb.CString( 0 )
+		      end if
+		      
 		    end if
-		  end if
-		  
-		  Break
+		    
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\InternalName", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.InternalName = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\InternalName", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.InternalName = mb.CString( 0 )
+		      end if
+		      
+		    end if
+		    
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\LegalCopyright", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.LegalCopyright = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\LegalCopyright", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.LegalCopyright = mb.CString( 0 )
+		      end if
+		    end if
+		    
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\LegalTrademarks", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.LegalTrademarks = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\LegalTrademarks", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.LegalTrademarks = mb.CString( 0 )
+		      end if
+		      
+		    end if
+		    
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\OriginalFilename", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.OriginalFilename = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\OriginalFilename", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.OriginalFilename = mb.CString( 0 )
+		      end if
+		      
+		    end if
+		    
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\ProductName", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.ProductName = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\ProductName", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.ProductName = mb.CString( 0 )
+		      end if
+		    end if
+		    
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\ProductVersion", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.ProductVersion = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\ProductVersion", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.ProductVersion = mb.WString( 0 )
+		      end if
+		    end if
+		    
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\PrivateBuild", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.PrivateBuild = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\PrivateBuild", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.PrivateBuild = mb.CString( 0 )
+		      end if
+		      
+		    end if
+		    
+		    if isUnicode then
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\SpecialBuild", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.SpecialBuild = mb.WString( 0 )
+		      end if
+		    else
+		      if VerQueryValueW( buffer, "\StringFileInfo\" + langCodePage + "\SpecialBuild", data, len ) then
+		        dim mb as MemoryBlock = data.Ptr( 0 ).StringValue( 0, len )
+		        ret.SpecialBuild = mb.CString( 0 )
+		      end if
+		    end if
+		    
+		    Break
 		Exception err as NilObjectException
 		  return nil
+		  
+		  #else
+		    
+		    #pragma unused f
+		    
+		  #endif
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Function HasChanged(extends f as FolderItem) As Boolean
 		  #if TargetWin32
+		    
 		    // Check to see if this folder item has a handle in the map
 		    dim handle as Integer
 		    try
@@ -630,6 +685,11 @@ Protected Module FolderItemExtensionsWFS
 		    
 		    // If we got here, no change has taken place!
 		    return false
+		    
+		  #else
+		    
+		    #pragma unused f
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -666,6 +726,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag Method, Flags = &h0
 		Function IsStartupItem(extends f as FolderItem, machineWide as Boolean) As Boolean
 		  #if TargetWin32
+		    
 		    dim runItem as RegistryItem
 		    
 		    if machineWide then
@@ -679,6 +740,12 @@ Protected Module FolderItemExtensionsWFS
 		    theAppName =  nthField( f.Name, ".", 1 )
 		    
 		    return (runItem.Value( theAppName ) <> "")
+		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused machineWide
+		    
 		  #endif
 		  
 		exception
@@ -689,6 +756,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub Launch(extends f as FolderItem, ParamArray args as String)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub ShellExecuteA Lib "Shell32" ( hwnd as Integer, operation as CString, _
 		    file as CString, params as CString, directory as CString, show as Integer )
 		    Soft Declare Sub ShellExecuteW Lib "Shell32" ( hwnd as Integer, operation as WString, _
@@ -702,6 +770,12 @@ Protected Module FolderItemExtensionsWFS
 		    else
 		      ShellExecuteA( 0, "open", f.AbsolutePath, params, "", 1 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused args
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -711,6 +785,7 @@ Protected Module FolderItemExtensionsWFS
 		  // We want to launch the application and wait for
 		  // it to finish executing before we return.
 		  #if TargetWin32
+		    
 		    Soft Declare Function CreateProcessW Lib "Kernel32" ( appName as WString, params as WString, _
 		    procAttribs as Integer, threadAttribs as Integer, inheritHandles as Boolean, flags as Integer, _
 		    env as Integer, curDir as Integer, startupInfo as Ptr, procInfo as Ptr ) as Boolean
@@ -763,6 +838,13 @@ Protected Module FolderItemExtensionsWFS
 		    Declare Sub CloseHandle Lib "Kernel32" ( handle as Integer )
 		    CloseHandle( procInfo.Long( 0 ) )
 		    CloseHandle( procInfo.Long( 4 ) )
+		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused params
+		    #pragma unused deskName
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -770,6 +852,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub LaunchAsAdministrator(extends f as FolderItem, ParamArray args as String)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub ShellExecuteA Lib "Shell32" ( hwnd as Integer, operation as CString, _
 		    file as CString, params as CString, directory as CString, show as Integer )
 		    Soft Declare Sub ShellExecuteW Lib "Shell32" ( hwnd as Integer, operation as WString, _
@@ -783,6 +866,12 @@ Protected Module FolderItemExtensionsWFS
 		    else
 		      ShellExecuteA( 0, "runas", f.AbsolutePath, params, "", 1 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused args
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -808,6 +897,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub Reveal(extends f as FolderItem)
 		  #if TargetWin32
+		    
 		    dim param as String = "/select, """ + f.AbsolutePath + """"
 		    
 		    Soft Declare Sub ShellExecuteA Lib "Shell32" ( hwnd as Integer, op as CString, file as CString, _
@@ -822,6 +912,11 @@ Protected Module FolderItemExtensionsWFS
 		    else
 		      ShellExecuteA( 0, "open", "explorer", param, 0, SW_SHOW )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -829,6 +924,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub StartupItem(extends f as FolderItem, machineWide as Boolean, assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    dim runItem as RegistryItem
 		    
 		    if machineWide then
@@ -847,7 +943,14 @@ Protected Module FolderItemExtensionsWFS
 		      runItem.Delete( theAppName )
 		    end
 		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused machineWide
+		    #pragma unused set
+		    
 		  #endif
+		  
 		exception
 		  return
 		End Sub
@@ -856,6 +959,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub StartWatchingForChanges(extends f as FolderItem, watchSubDirs as Boolean)
 		  #if TargetWin32
+		    
 		    Soft Declare Function FindFirstChangeNotificationA Lib "Kernel32" ( path as CString, watchSubDirs as Boolean, flags as Integer ) as Integer
 		    Soft Declare Function FindFirstChangeNotificationW Lib "Kernel32" ( path as WString, watchSubDirs as Boolean, flags as Integer ) as Integer
 		    
@@ -878,6 +982,11 @@ Protected Module FolderItemExtensionsWFS
 		      mChangeHandles.Value( f.AbsolutePath ) = handle
 		    end
 		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused watchSubDirs
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -885,6 +994,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub StopWatchingForChanges(extends f as FolderItem)
 		  #if TargetWin32
+		    
 		    // Check to see if this folder item has a handle in the map
 		    dim handle as Integer
 		    try
@@ -901,6 +1011,11 @@ Protected Module FolderItemExtensionsWFS
 		    
 		    // And remove the item from the map
 		    mChangeHandles.Remove( f.AbsolutePath )
+		    
+		  #else
+		    
+		    #pragma unused f
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
