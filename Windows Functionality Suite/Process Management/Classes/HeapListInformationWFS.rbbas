@@ -34,7 +34,7 @@ Protected Class HeapListInformationWFS
 		    
 		    dim mb as new MemoryBlock( 36 )
 		    
-		    dim entry as HeapEntryInformation
+		    dim entry as HeapEntryInformationWFS
 		    
 		    mb.Long( 0 ) = mb.Size
 		    if not Heap32First( mb, OwnerProcessID, HeapListID ) then return
@@ -42,7 +42,7 @@ Protected Class HeapListInformationWFS
 		    dim good as Integer
 		    
 		    do
-		      entry = new HeapEntryInformation( mb )
+		      entry = new HeapEntryInformationWFS( mb )
 		      
 		      HeapEntries.Append( entry )
 		      

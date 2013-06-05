@@ -300,7 +300,7 @@ Protected Module ServiceManagerWFS
 		    
 		    if mManager = 0 then return nil
 		    
-		    serv = new Service
+		    serv = new ServiceWFS
 		    if System.IsFunctionAvailable( "OpenServiceW", "AdvApi32" ) then
 		      serv.Handle = OpenServiceW( mManager, name, access )
 		    else

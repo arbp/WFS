@@ -255,10 +255,10 @@ Inherits InternetSessionWFS
 		    Const INTERNET_FLAG_RELOAD = &h80000000
 		    dim mb as MemoryBlock
 		    if System.IsFunctionAvailable( "FtpFindFirstFileW", "WinInet" ) then
-		      mb = new MemoryBlock( FindFile.kUnicodeSize )
+		      mb = new MemoryBlock( FindFileWFS.kUnicodeSize )
 		      mInternalFindHandle = FtpFindFirstFileW( mFTPHandle, search, mb, INTERNET_FLAG_RELOAD, 0 )
 		    else
-		      mb = new MemoryBlock( FindFile.kANSISize )
+		      mb = new MemoryBlock( FindFileWFS.kANSISize )
 		      mInternalFindHandle = FtpFindFirstFileA( mFTPHandle, search, mb, INTERNET_FLAG_RELOAD, 0 )
 		    end if
 		    
@@ -271,7 +271,7 @@ Inherits InternetSessionWFS
 		      return nil
 		    end if
 		    
-		    return new FindFile( mb )
+		    return new FindFileWFS( mb )
 		    
 		  #else
 		    

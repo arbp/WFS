@@ -100,10 +100,10 @@ Protected Class InternetSessionWFS
 		    dim mb as MemoryBlock
 		    dim success as Boolean
 		    if System.IsFunctionAvailable( "InternetFindNextFileW", "WinInet" ) then
-		      mb = new MemoryBlock( FindFile.kUnicodeSize )
+		      mb = new MemoryBlock( FindFileWFS.kUnicodeSize )
 		      success = InternetFindNextFileW( mInternalFindHandle, mb )
 		    else
-		      mb = new MemoryBlock( FindFile.kANSISize )
+		      mb = new MemoryBlock( FindFileWFS.kANSISize )
 		      success = InternetFindNextFileA( mInternalFindHandle, mb )
 		    end if
 		    
@@ -117,7 +117,7 @@ Protected Class InternetSessionWFS
 		    if not success then
 		      CloseHandle( mInternalFindHandle )
 		    else
-		      return new FindFile( mb )
+		      return new FindFileWFS( mb )
 		    end if
 		  #endif
 		End Function
