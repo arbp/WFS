@@ -55,6 +55,7 @@ Protected Class FontWFS
 	#tag Method, Flags = &h0
 		Sub RealizeFont(handle as Integer, forceRefresh as Boolean = true)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub SendMessageA Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer )
 		    Soft Declare Sub SendMessageW Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer )
 		    
@@ -68,6 +69,12 @@ Protected Class FontWFS
 		    else
 		      SendMessageA( handle, WM_SETFONT, me.Lock, refresh )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused handle
+		    #pragma unused forceRefresh
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -88,6 +95,7 @@ Protected Class FontWFS
 	#tag Method, Flags = &h0
 		Sub Size(type as Integer = 0, assigns set as Integer)
 		  #if TargetWin32
+		    
 		    select case type
 		    case kSizeTypePoint
 		      // We need to use MulDiv to convert this into the proper metric
@@ -103,6 +111,12 @@ Protected Class FontWFS
 		    else
 		      raise new TypeMismatchException
 		    end select
+		    
+		  #else
+		    
+		    #pragma unused type
+		    #pragma unused set
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

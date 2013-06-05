@@ -100,6 +100,7 @@ Implements WndProcSubclassWFS
 	#tag Method, Flags = &h0
 		Function RegisterHotKey(modifiers as Integer, virtualKey as Integer) As Integer
 		  #if TargetWin32
+		    
 		    // Come up with a new identifier for the hotkey
 		    dim id as Integer
 		    Soft Declare Function GlobalAddAtomA Lib "Kernel32" ( name as CString ) as Integer
@@ -121,6 +122,12 @@ Implements WndProcSubclassWFS
 		    dim ret as Boolean = MyRegisterHotKey( mWindow.WinHWND, id, modifiers, virtualKey )
 		    
 		    return id
+		    
+		  #else
+		    
+		    #pragma unused modifiers
+		    #pragma unused virtualKey
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -128,6 +135,7 @@ Implements WndProcSubclassWFS
 	#tag Method, Flags = &h0
 		Sub UnregisterHotKey(id as Integer)
 		  #if TargetWin32
+		    
 		    // FIrst, unregister the hotkey
 		    Declare Function MyUnregisterHotKey Lib "User32" Alias "UnregisterHotKey" ( hwnd as Integer, _
 		    id as Integer ) as Boolean
@@ -140,6 +148,11 @@ Implements WndProcSubclassWFS
 		    
 		    // Find the atom in our table and remove it
 		    mAtomTable.Remove( mAtomTable.IndexOf( id ) )
+		    
+		  #else
+		    
+		    #pragma unused id
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -159,6 +172,8 @@ Implements WndProcSubclassWFS
 		  end
 		  
 		  return false
+		  
+		  #pragma unused hWnd
 		End Function
 	#tag EndMethod
 

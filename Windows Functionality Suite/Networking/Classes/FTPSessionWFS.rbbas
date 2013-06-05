@@ -4,6 +4,7 @@ Inherits InternetSessionWFS
 	#tag Method, Flags = &h0
 		Sub Connect(url as String, username as String, password as String)
 		  #if TargetWin32
+		    
 		    Soft Declare Function InternetConnectA Lib "WinInet" ( handle as Integer, server as CString, _
 		    port as Integer, username as CString, password as CString, servic as Integer, flags as Integer, _
 		    context as Integer ) as Integer
@@ -31,6 +32,13 @@ Inherits InternetSessionWFS
 		      FireException( "Could not open the FTP connection" )
 		      return
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused url
+		    #pragma unused username
+		    #pragma unused password
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -51,6 +59,7 @@ Inherits InternetSessionWFS
 		  end if
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Function FtpCreateDirectoryW Lib "WinInet" ( handle as Integer, name as WString ) as Boolean
 		    Soft Declare Function FtpCreateDirectoryA Lib "WinInet" ( handle as Integer, name as CString ) as Boolean
 		    
@@ -65,6 +74,10 @@ Inherits InternetSessionWFS
 		      FireException( "Could not create the directory" )
 		      return
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused name
 		    
 		  #endif
 		End Sub

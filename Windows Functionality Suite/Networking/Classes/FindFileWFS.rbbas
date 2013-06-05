@@ -50,7 +50,9 @@ Protected Class FindFileWFS
 		  // And instead of doing very hard math conversions, we
 		  // will just get a SYSTEMTIME structure from it, and fill out
 		  // our RB Date object from that.  Yay!
+		  
 		  #if TargetWin32
+		    
 		    Declare Function FileTimeToSystemTime Lib "Kernel32" ( ft as Ptr, sysTime as Ptr ) as Boolean
 		    
 		    dim ft as new MemoryBlock( 8 )
@@ -73,6 +75,12 @@ Protected Class FindFileWFS
 		    else
 		      return nil
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused lo
+		    #pragma unused hi
+		    
 		  #endif
 		End Function
 	#tag EndMethod
