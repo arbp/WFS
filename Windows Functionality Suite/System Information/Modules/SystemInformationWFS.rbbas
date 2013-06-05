@@ -2,75 +2,80 @@
 Protected Module SystemInformationWFS
 	#tag Method, Flags = &h1
 		Protected Function CPUUsage() As Double
-		  Soft Declare Sub NtQuerySystemInformation Lib "ntdll" ( infoClass as Integer, data as Ptr, length as Integer, ByRef retLength as Integer )
-		  
-		  if not System.IsFunctionAvailable( "NtQuerySystemInformation", "ntdll" ) then return -1.0
-		  
-		  Const SYSTEM_PERFORMANCEINFORMATION = 2
-		  Const SYSTEM_TIMEINFORMATION = 3
-		  
-		  Dim retStructSize as Integer
-		  
-		  // First, get the system time information
-		  Dim sysTimeInfo as new MemoryBlock( 32 )
-		  NtQuerySystemInformation( SYSTEM_TIMEINFORMATION, sysTimeInfo, sysTimeInfo.Size, retStructSize )
-		  
-		  // Then get the system's idle time information
-		  Dim sysIdleTimeInfo as new MemoryBlock( 312 )
-		  NtQuerySystemInformation( SYSTEM_PERFORMANCEINFORMATION, sysIdleTimeInfo, sysIdleTimeInfo.Size, retStructSize )
-		  
-		  // Current value = New value - Old value
-		  Static sOldIdleTime, sOldSystemTime as Double
-		  
-		  // Note, we can just pass this MemoryBlock in because the
-		  // LongLongToDouble API assumes that the long long is the
-		  // first 8 bytes of the block, which it just so happens to be
-		  // in the sysIdleTimeInfo structure.
-		  Dim dbIdleTime as Double
-		  #if RBVersion < 2006.01 then
-		    dbIdleTime = LongLongToDouble( sysIdleTimeInfo ) - sOldIdleTime
-		  #else
-		    dbIdleTime = sysIdleTimeInfo.UInt64Value( 0 ) - sOldIdleTime
+		  #if TargetWin32
+		    
+		    Soft Declare Sub NtQuerySystemInformation Lib "ntdll" ( infoClass as Integer, data as Ptr, length as Integer, ByRef retLength as Integer )
+		    
+		    if not System.IsFunctionAvailable( "NtQuerySystemInformation", "ntdll" ) then return -1.0
+		    
+		    Const SYSTEM_PERFORMANCEINFORMATION = 2
+		    Const SYSTEM_TIMEINFORMATION = 3
+		    
+		    Dim retStructSize as Integer
+		    
+		    // First, get the system time information
+		    Dim sysTimeInfo as new MemoryBlock( 32 )
+		    NtQuerySystemInformation( SYSTEM_TIMEINFORMATION, sysTimeInfo, sysTimeInfo.Size, retStructSize )
+		    
+		    // Then get the system's idle time information
+		    Dim sysIdleTimeInfo as new MemoryBlock( 312 )
+		    NtQuerySystemInformation( SYSTEM_PERFORMANCEINFORMATION, sysIdleTimeInfo, sysIdleTimeInfo.Size, retStructSize )
+		    
+		    // Current value = New value - Old value
+		    Static sOldIdleTime, sOldSystemTime as Double
+		    
+		    // Note, we can just pass this MemoryBlock in because the
+		    // LongLongToDouble API assumes that the long long is the
+		    // first 8 bytes of the block, which it just so happens to be
+		    // in the sysIdleTimeInfo structure.
+		    Dim dbIdleTime as Double
+		    #if RBVersion < 2006.01 then
+		      dbIdleTime = LongLongToDouble( sysIdleTimeInfo ) - sOldIdleTime
+		    #else
+		      dbIdleTime = sysIdleTimeInfo.UInt64Value( 0 ) - sOldIdleTime
+		    #endif
+		    
+		    // We're not so lucky here -- we need to get the long long into
+		    // a new memory block
+		    Dim tempMb as new MemoryBlock( 8 )
+		    tempMb.Long( 0 ) = sysTimeInfo.Long( 8 )
+		    tempMb.Long( 4 ) = sysTimeInfo.Long( 12 )
+		    Dim dbSystemTime as Double
+		    #if RBVersion < 2006.01 then
+		      dbSystemTime = LongLongToDouble( tempMb ) - sOldSystemTime
+		    #else
+		      dbSystemTime = tempMb.UInt64Value( 0 ) - sOldSystemTime
+		    #endif
+		    
+		    Dim retVal as Double
+		    
+		    // Divide the idle by the system time
+		    if dbSystemTime <> 0 then
+		      retVal = dbIdleTime / dbSystemTime
+		    else
+		      retVal = dbIdleTime
+		    end if
+		    
+		    // Get the number of processors, but cache the information
+		    // since it's not going to change while the application is running.
+		    Static sNumProcessors as Integer
+		    if sNumProcessors = 0 then sNumProcessors = NumberOfProcessors
+		    
+		    // Now get the true CPU usage time
+		    retVal = 100 - retVal * 100 / sNumProcessors + .5
+		    
+		    // Then store the values for the next query
+		    #if RBVersion < 2006.001 then
+		      sOldIdleTime = LongLongToDouble( sysIdleTimeInfo )
+		      sOldSystemTime = LongLongToDouble( tempMb )
+		    #else
+		      sOldIdleTime = sysIdleTimeInfo.UInt64Value( 0 )
+		      sOldSystemTime = tempMb.UInt64Value( 0 )
+		    #endif
+		    return retVal / 100
+		    
 		  #endif
 		  
-		  // We're not so lucky here -- we need to get the long long into
-		  // a new memory block
-		  Dim tempMb as new MemoryBlock( 8 )
-		  tempMb.Long( 0 ) = sysTimeInfo.Long( 8 )
-		  tempMb.Long( 4 ) = sysTimeInfo.Long( 12 )
-		  Dim dbSystemTime as Double
-		  #if RBVersion < 2006.01 then
-		    dbSystemTime = LongLongToDouble( tempMb ) - sOldSystemTime
-		  #else
-		    dbSystemTime = tempMb.UInt64Value( 0 ) - sOldSystemTime
-		  #endif
-		  
-		  Dim retVal as Double
-		  
-		  // Divide the idle by the system time
-		  if dbSystemTime <> 0 then
-		    retVal = dbIdleTime / dbSystemTime
-		  else
-		    retVal = dbIdleTime
-		  end if
-		  
-		  // Get the number of processors, but cache the information
-		  // since it's not going to change while the application is running.
-		  Static sNumProcessors as Integer
-		  if sNumProcessors = 0 then sNumProcessors = NumberOfProcessors
-		  
-		  // Now get the true CPU usage time
-		  retVal = 100 - retVal * 100 / sNumProcessors + .5
-		  
-		  // Then store the values for the next query
-		  #if RBVersion < 2006.001 then
-		    sOldIdleTime = LongLongToDouble( sysIdleTimeInfo )
-		    sOldSystemTime = LongLongToDouble( tempMb )
-		  #else
-		    sOldIdleTime = sysIdleTimeInfo.UInt64Value( 0 )
-		    sOldSystemTime = tempMb.UInt64Value( 0 )
-		  #endif
-		  return retVal / 100
 		End Function
 	#tag EndMethod
 
@@ -252,6 +257,7 @@ Protected Module SystemInformationWFS
 	#tag Method, Flags = &h1
 		Protected Function GetSystemName(root as FolderItem) As String
 		  #if TargetWin32
+		    
 		    Soft Declare Function GetVolumeInformationA Lib "Kernel32" ( root as CString, _
 		    volName as Ptr, volNameSize as Integer, ByRef volSer as Integer, ByRef _
 		    maxCompLength as Integer, ByRef sysFlags as Integer, sysName as Ptr, _
@@ -277,6 +283,11 @@ Protected Module SystemInformationWFS
 		      
 		      return sysName.CString( 0 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused root
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -381,7 +392,8 @@ Protected Module SystemInformationWFS
 		  // Fin...: 31/05/2004
 		  // Notes.: Set the default printer to strPrinterName
 		  
-		  #IF targetWin32
+		  #If TargetWin32
+		    
 		    Soft Declare Function SetDefaultPrinterW Lib "WinSpool" ( printer as WString ) as Boolean
 		    if System.IsFunctionAvailable( "SetDefaultPrinterW", "WinSpool" ) then
 		      return SetDefaultPrinterW( strPrinterName )
@@ -484,89 +496,110 @@ Protected Module SystemInformationWFS
 		    
 		    RETURN ok
 		    
-		  #ENDIF
+		  #else
+		    
+		    #pragma unused strPrinterName
+		    
+		  #endif
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
 		Protected Function SetScreenResolution(width as Integer, height as Integer, depth as Integer) As Integer
-		  Soft Declare Function EnumDisplaySettingsW Lib "user32" ( null as Integer, iModeNum As Integer, lpDevMode As Ptr ) As Integer
-		  Soft Declare Function EnumDisplaySettingsA Lib "user32" ( null as Integer, iModeNum As Integer, lpDevMode As Ptr ) As Integer
-		  
-		  Soft Declare Function ChangeDisplaySettingsW Lib "user32" ( lpDevMode As Ptr,  dwFlags As Integer ) As Integer
-		  Soft Declare Function ChangeDisplaySettingsA Lib "user32" ( lpDevMode As Ptr,  dwFlags As Integer ) As Integer
-		  
-		  Const ENUM_CURRENT_SETTINGS = -1
-		  
-		  Const CDS_UPDATEREGISTRY = &H1
-		  Const CDS_TEST = &H2
-		  Const DISP_CHANGE_SUCCESSFUL = 0
-		  Const DISP_CHANGE_RESTART = 1
-		  
-		  // First, figure out whether we're unicode savvy or not
-		  Dim unicodeSavvy as Boolean = System.IsFunctionAvailable( "EnumDisplaySettingsW", "User32" )
-		  
-		  // Now, allocate a DEVMODE structure and set its dmSize property
-		  dim devMode as MemoryBlock
-		  if unicodeSavvy then
-		    devMode = new MemoryBlock( 188 )
-		    devMode.Long( 68 ) = devMode.Size
-		  else
-		    devMode = new MemoryBlock( 124 )
-		    devMode.Long( 36 ) = devMode.Size
-		  end if
-		  
-		  dim offset as Integer = devMode.Size - 20
-		  
-		  dim retVal as Integer
-		  if unicodeSavvy then
-		    retVal = EnumDisplaySettingsW( 0, ENUM_CURRENT_SETTINGS, devMode )
-		  else
-		    retVal = EnumDisplaySettingsA( 0, ENUM_CURRENT_SETTINGS, devMode )
-		  end if
-		  
-		  if retVal = 0 then return kResolutionChangeFailed
-		  
-		  // Make the requested changes
-		  devMode.Long( offset ) = depth
-		  devMode.Long( offset + 4 ) = width
-		  devMode.Long( offset + 8 ) = height
-		  
-		  // Check to see whether we can make the change
-		  if unicodeSavvy then
-		    retVal = ChangeDisplaySettingsW( devMode, CDS_TEST )
-		  else
-		    retVal = ChangeDisplaySettingsA( devMode, CDS_TEST )
-		  end if
-		  
-		  if retVal <> DISP_CHANGE_SUCCESSFUL then return kResolutionChangeFailed
-		  
-		  // We're able to make the change, so let's actually do the change
-		  if unicodeSavvy then
-		    retVal = ChangeDisplaySettingsW( devMode, CDS_UPDATEREGISTRY )
-		  else
-		    retVal = ChangeDisplaySettingsA( devMode, CDS_UPDATEREGISTRY )
-		  end if
-		  
-		  select case retVal
-		  case DISP_CHANGE_RESTART
-		    return kResolutionChangeRequiresReboot
+		  #if TargetWin32
 		    
-		  case DISP_CHANGE_SUCCESSFUL
-		    return kResolutionChangeSuccess
+		    Soft Declare Function EnumDisplaySettingsW Lib "user32" ( null as Integer, iModeNum As Integer, lpDevMode As Ptr ) As Integer
+		    Soft Declare Function EnumDisplaySettingsA Lib "user32" ( null as Integer, iModeNum As Integer, lpDevMode As Ptr ) As Integer
 		    
-		  else
-		    return kResolutionChangeFailed
-		  end select
+		    Soft Declare Function ChangeDisplaySettingsW Lib "user32" ( lpDevMode As Ptr,  dwFlags As Integer ) As Integer
+		    Soft Declare Function ChangeDisplaySettingsA Lib "user32" ( lpDevMode As Ptr,  dwFlags As Integer ) As Integer
+		    
+		    Const ENUM_CURRENT_SETTINGS = -1
+		    
+		    Const CDS_UPDATEREGISTRY = &H1
+		    Const CDS_TEST = &H2
+		    Const DISP_CHANGE_SUCCESSFUL = 0
+		    Const DISP_CHANGE_RESTART = 1
+		    
+		    // First, figure out whether we're unicode savvy or not
+		    Dim unicodeSavvy as Boolean = System.IsFunctionAvailable( "EnumDisplaySettingsW", "User32" )
+		    
+		    // Now, allocate a DEVMODE structure and set its dmSize property
+		    dim devMode as MemoryBlock
+		    if unicodeSavvy then
+		      devMode = new MemoryBlock( 188 )
+		      devMode.Long( 68 ) = devMode.Size
+		    else
+		      devMode = new MemoryBlock( 124 )
+		      devMode.Long( 36 ) = devMode.Size
+		    end if
+		    
+		    dim offset as Integer = devMode.Size - 20
+		    
+		    dim retVal as Integer
+		    if unicodeSavvy then
+		      retVal = EnumDisplaySettingsW( 0, ENUM_CURRENT_SETTINGS, devMode )
+		    else
+		      retVal = EnumDisplaySettingsA( 0, ENUM_CURRENT_SETTINGS, devMode )
+		    end if
+		    
+		    if retVal = 0 then return kResolutionChangeFailed
+		    
+		    // Make the requested changes
+		    devMode.Long( offset ) = depth
+		    devMode.Long( offset + 4 ) = width
+		    devMode.Long( offset + 8 ) = height
+		    
+		    // Check to see whether we can make the change
+		    if unicodeSavvy then
+		      retVal = ChangeDisplaySettingsW( devMode, CDS_TEST )
+		    else
+		      retVal = ChangeDisplaySettingsA( devMode, CDS_TEST )
+		    end if
+		    
+		    if retVal <> DISP_CHANGE_SUCCESSFUL then return kResolutionChangeFailed
+		    
+		    // We're able to make the change, so let's actually do the change
+		    if unicodeSavvy then
+		      retVal = ChangeDisplaySettingsW( devMode, CDS_UPDATEREGISTRY )
+		    else
+		      retVal = ChangeDisplaySettingsA( devMode, CDS_UPDATEREGISTRY )
+		    end if
+		    
+		    select case retVal
+		    case DISP_CHANGE_RESTART
+		      return kResolutionChangeRequiresReboot
+		      
+		    case DISP_CHANGE_SUCCESSFUL
+		      return kResolutionChangeSuccess
+		      
+		    else
+		      return kResolutionChangeFailed
+		    end select
+		    
+		  #else
+		    
+		    #pragma unused width
+		    #pragma unused height
+		    #pragma unused depth
+		    
+		  #endif
+		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
 		Protected Function Shutdown(mode as Integer) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function ExitWindowsEx Lib "User32" ( flags as Integer, zero as Integer ) as Boolean
 		    
 		    return ExitWindowsEx( mode, 0 )
+		    
+		  #else
+		    
+		    #pragma unused mode
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -578,6 +611,7 @@ Protected Module SystemInformationWFS
 		  // from going to Start->Shutdown  There's no way to figure out what the user selected
 		  
 		  #if TargetWin32
+		    
 		    // Let's start hacking!  Load the function pointer up via an ordinal.  Note, this function is
 		    // not documented by Microsoft, nor is it officially sanctioned.  We'll use it anyways because we're cool like that.
 		    Soft Declare Sub ExitWindowsDialog Lib "Shell32" Alias "#60" ( owner as Integer )
@@ -586,6 +620,11 @@ Protected Module SystemInformationWFS
 		    if owner <> nil then ownerHandle = owner.WinHWND
 		    
 		    ExitWindowsDialog( ownerHandle )
+		    
+		  #else
+		    
+		    #pragma unused owner
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -593,6 +632,7 @@ Protected Module SystemInformationWFS
 	#tag Method, Flags = &h1
 		Protected Function Shutdown(owner as Window, reason as String, type as Integer) As Boolean
 		  #if TargetWin32
+		    
 		    // Let's start hacking!  Load the function pointer up via an ordinal.  Note, this function is
 		    // not documented by Microsoft, nor is it officially sanctioned.  We'll use it anyways because we're cool like that.
 		    Soft Declare Function RestartDialog Lib "Shell32" Alias "#59" ( owner as Integer, reason as Ptr, flags as Integer ) as Integer
@@ -616,6 +656,13 @@ Protected Module SystemInformationWFS
 		    Const IDCANCEL = 2
 		    
 		    return retVal = IDOK
+		    
+		  #else
+		    
+		    #pragma unused owner
+		    #pragma unused reason
+		    #pragma unused type
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -676,6 +723,7 @@ Protected Module SystemInformationWFS
 	#tag Method, Flags = &h1
 		Protected Sub SystemMasterVolume(assigns vol as Integer)
 		  #if TargetWin32
+		    
 		    Declare Function mixerOpen Lib "winmm" ( ByRef handle as Integer, id as Integer, _
 		    callback as Integer, instance as Integer, open as Integer ) as Integer
 		    Declare Function mixerGetNumDevs Lib "winmm" () as Integer
@@ -722,6 +770,11 @@ Protected Module SystemInformationWFS
 		    
 		    dim ret as Integer
 		    ret = mixerSetControlDetails( device, details, 0 )
+		    
+		  #else
+		    
+		    #pragma unused vol
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -791,6 +844,7 @@ Protected Module SystemInformationWFS
 	#tag Method, Flags = &h1
 		Protected Sub WavVolume(assigns vol as Integer)
 		  #if TargetWin32
+		    
 		    Declare Function waveOutOpen Lib "winmm" ( ByRef out as Integer, devid as Integer, format as Ptr, _
 		    callback as Integer, instance as Integer, open as Integer ) as Integer
 		    Declare Function waveOutGetNumDevs Lib "winmm" () as Integer
@@ -816,6 +870,11 @@ Protected Module SystemInformationWFS
 		    next
 		    
 		    Call waveOutSetVolume( device, vol )
+		    
+		  #else
+		    
+		    #pragma unused vol
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

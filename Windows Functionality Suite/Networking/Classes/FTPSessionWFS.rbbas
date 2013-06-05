@@ -113,6 +113,7 @@ Inherits InternetSessionWFS
 		  end if
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Function FtpSetCurrentDirectoryW Lib "WinInet" ( handle as Integer, dir as WString ) as Boolean
 		    Soft Declare Function FtpSetCurrentDirectoryA Lib "WinInet" ( handle as Integer, dir as CString ) as Boolean
 		    
@@ -128,6 +129,10 @@ Inherits InternetSessionWFS
 		      return
 		    end if
 		    
+		  #else
+		    
+		    #pragma unused name
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -141,6 +146,7 @@ Inherits InternetSessionWFS
 		  end if
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Function FtpRemoveDirectoryW Lib "WinInet" ( handle as Integer, name as WString ) as Boolean
 		    Soft Declare Function FtpRemoveDirectoryA Lib "WinInet" ( handle as Integer, name as CString ) as Boolean
 		    
@@ -156,6 +162,10 @@ Inherits InternetSessionWFS
 		      return
 		    end if
 		    
+		  #else
+		    
+		    #pragma unused name
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -169,6 +179,7 @@ Inherits InternetSessionWFS
 		  end if
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Function FtpDeleteFileW Lib "WinInet" ( handle as Integer, name as WString ) as Boolean
 		    Soft Declare Function FtpDeleteFileA Lib "WinInet" ( handle as Integer, name as CString ) as Boolean
 		    
@@ -183,6 +194,10 @@ Inherits InternetSessionWFS
 		      FireException( "Could not delete the file" )
 		      return
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused name
 		    
 		  #endif
 		End Sub
@@ -244,6 +259,11 @@ Inherits InternetSessionWFS
 		    end if
 		    
 		    return new FindFile( mb )
+		    
+		  #else
+		    
+		    #pragma unused search
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -263,6 +283,7 @@ Inherits InternetSessionWFS
 		  end if
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Function FtpGetFileW Lib "WinInet" ( handle as Integer, remote as WString, local as WString, _
 		    fail as Boolean, attribs as Integer, flags as Integer, context as Integer ) as Boolean
 		    Soft Declare Function FtpGetFileA Lib "WinInet" ( handle as Integer, remote as WString, local as WString, _
@@ -285,33 +306,39 @@ Inherits InternetSessionWFS
 		      FireException( "Could not get the remote file" )
 		      return
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused bFailIfExists
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub PutFile(f as FolderItem, remoteName as String = "")
-		  // Sanity checks
-		  if f.Directory then
-		    FireException( "Trying to put a directory by calling PutFile" )
-		    return
-		  end if
-		  
-		  if mFTPHandle = 0 then
-		    FireException( "Trying to put a file while not connected" )
-		    return
-		  end if
-		  
-		  // The first thing we need to do is make
-		  // sure that our local directory is correct.
-		  SetLocalDirectory( f.Parent )
-		  
-		  // Setup our support code
-		  if remoteName = "" then remoteName = f.Name
-		  
-		  dim flags as Integer = TransferType
-		  
 		  #if TargetWin32
+		    
+		    // Sanity checks
+		    if f.Directory then
+		      FireException( "Trying to put a directory by calling PutFile" )
+		      return
+		    end if
+		    
+		    if mFTPHandle = 0 then
+		      FireException( "Trying to put a file while not connected" )
+		      return
+		    end if
+		    
+		    // The first thing we need to do is make
+		    // sure that our local directory is correct.
+		    SetLocalDirectory( f.Parent )
+		    
+		    // Setup our support code
+		    if remoteName = "" then remoteName = f.Name
+		    
+		    dim flags as Integer = TransferType
+		    
 		    Soft Declare Function FtpPutFileA Lib "WinInet" ( handle as Integer, localFile as CString, remoteFile as CString, _
 		    flags as Integer, context as Integer ) as Boolean
 		    Soft Declare Function FtpPutFileW Lib "WinInet" ( handle as Integer, localFile as WString, remoteFile as WString, _
@@ -329,6 +356,12 @@ Inherits InternetSessionWFS
 		      FireException( "Could not upload the file" )
 		      return
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused remoteName
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -385,6 +418,12 @@ Inherits InternetSessionWFS
 		      FireException( "Could not rename the file" )
 		      return
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused existing
+		    #pragma unused newName
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -392,6 +431,7 @@ Inherits InternetSessionWFS
 	#tag Method, Flags = &h0
 		Sub SetLocalDirectory(dir as FolderItem)
 		  #if TargetWin32
+		    
 		    Soft Declare Function SetCurrentDirectoryA Lib "Kernel32" ( dir as CString ) as Boolean
 		    Soft Declare Function SetCurrentDirectoryW Lib "Kernel32" ( dir as WString ) as Boolean
 		    
@@ -408,6 +448,11 @@ Inherits InternetSessionWFS
 		    else
 		      success = SetCurrentDirectoryA( dir.AbsolutePath )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused dir
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

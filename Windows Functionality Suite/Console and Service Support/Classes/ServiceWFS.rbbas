@@ -3,6 +3,7 @@ Protected Class ServiceWFS
 	#tag Method, Flags = &h1
 		Protected Sub InternalControlService(handle as Integer, controlCode as Integer)
 		  #if TargetWin32
+		    
 		    Declare Sub ControlService Lib "AdvApi32" ( handle as Integer, code as Integer, status as Ptr )
 		    
 		    dim status as new MemoryBlock( 7 * 4 )
@@ -34,6 +35,12 @@ Protected Class ServiceWFS
 		    case 7
 		      mIsPaused = True
 		    end select
+		    
+		  #else
+		    
+		    #pragma unused handle
+		    #pragma unused controlCode
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -115,6 +122,7 @@ Protected Class ServiceWFS
 	#tag Method, Flags = &h0
 		Sub Start(ParamArray params as String)
 		  #if TargetWin32
+		    
 		    Dim theParams, param as String
 		    Dim numParams as Integer
 		    dim paramsPtr as new MemoryBlock( 4 )
@@ -150,6 +158,11 @@ Protected Class ServiceWFS
 		        StartServiceA( Handle, numParams, paramsPtr )
 		      end if
 		    end
+		    
+		  #else
+		    
+		    #pragma unused params
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

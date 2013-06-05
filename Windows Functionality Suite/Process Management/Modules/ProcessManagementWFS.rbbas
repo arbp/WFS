@@ -27,6 +27,7 @@ Protected Module ProcessManagementWFS
 	#tag Method, Flags = &h1
 		Protected Sub ApplicationPriority(assigns level as Integer)
 		  #if TargetWin32
+		    
 		    Declare Function OpenProcess Lib "Kernel32" ( access as Integer, inherit as Boolean, procID as Integer ) as Integer
 		    Declare Sub SetPriorityClass Lib "Kernel32" ( handle as Integer, priority as Integer )
 		    Declare Sub CloseHandle Lib "Kernel32" ( handle as Integer )
@@ -41,6 +42,11 @@ Protected Module ProcessManagementWFS
 		    
 		    ' And close the handle to the module
 		    CloseHandle( processHandle )
+		    
+		  #else
+		    
+		    #pragma unused level
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -48,6 +54,7 @@ Protected Module ProcessManagementWFS
 	#tag Method, Flags = &h1
 		Protected Sub BringToFront(process as ProcessInformationWFS)
 		  #if TargetWin32
+		    
 		    // First, make sure we've loaded our thread information
 		    if UBound( process.LoadedThreads ) = -1 then process.LoadThreads
 		    
@@ -59,6 +66,11 @@ Protected Module ProcessManagementWFS
 		      
 		      EnumThreadWindows( process.LoadedThreads( i ).ThreadID, AddressOf BringToFrontCallback, 0 )
 		    next i
+		    
+		  #else
+		    
+		    #pragma unused process
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -66,11 +78,18 @@ Protected Module ProcessManagementWFS
 	#tag Method, Flags = &h0
 		Function BringToFrontCallback(hwnd as Integer, cookie as Integer) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Sub BringWindowToTop Lib "User32" ( hwnd as Integer )
 		    
 		    BringWindowToTop( hwnd )
 		    
 		    Return true
+		    
+		  #else
+		    
+		    #pragma unused hwnd
+		    #pragma unused cookie
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -202,9 +221,16 @@ Protected Module ProcessManagementWFS
 	#tag Method, Flags = &h1
 		Protected Sub HideWin9xProcess(procID as Integer, hide as Boolean = true)
 		  #if TargetWin32
+		    
 		    Declare Sub RegisterServiceProcess Lib "Kernel32" ( id as Integer, reg as Boolean )
 		    
 		    RegisterServiceProcess( procID, hide )
+		    
+		  #else
+		    
+		    #pragma unused procID
+		    #pragma unused hide
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

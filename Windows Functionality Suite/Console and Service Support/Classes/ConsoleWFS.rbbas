@@ -3,6 +3,7 @@ Protected Class ConsoleWFS
 	#tag Method, Flags = &h21
 		Private Sub AttemptReadInput(handle as Integer)
 		  #if TargetWin32
+		    
 		    Declare Function ReadConsoleInput Lib "Kernel32" Alias "ReadConsoleInputA" ( handle as Integer, record as Ptr, length as Integer, ByRef eventsRead as Integer ) as Boolean
 		    Declare Sub GetNumberOfConsoleInputEvents Lib "Kernel32" ( handle as Integer, ByRef numEvents as Integer )
 		    
@@ -55,6 +56,11 @@ Protected Class ConsoleWFS
 		        call bs.Read( kEventDataSize )
 		      end select
 		    next i
+		    
+		  #else
+		    
+		    #pragma unused handle
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -88,9 +94,15 @@ Protected Class ConsoleWFS
 	#tag Method, Flags = &h21
 		Private Function GetStdHandle(which as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Declare Function MyGetStdHandle Lib "Kernel32" Alias "GetStdHandle" ( which as Integer ) as Integer
 		    
 		    return MyGetStdHandle( which )
+		    
+		  #else
+		    
+		    #pragma unused which
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -182,6 +194,7 @@ Protected Class ConsoleWFS
 		Function KeyStringFromVirtualKeyCode(virtualKeyCode as Integer) As String
 		  // And be sure to add on the virtual key string
 		  #if TargetWin32
+		    
 		    Soft Declare Function MapVirtualKeyA Lib "User32" ( vk as Integer, type as Integer ) as Integer
 		    Soft Declare Function MapVirtualKeyW Lib "User32" ( vk as Integer, type as Integer ) as Integer
 		    
@@ -212,6 +225,12 @@ Protected Class ConsoleWFS
 		      keyTextLen = GetKeyNameTextA( scanCode, keyText, keyText.SIze )
 		      return keyText.CString( 0 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused virtualKeyCode
+		    return ""
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -303,6 +322,7 @@ Protected Class ConsoleWFS
 	#tag Method, Flags = &h0
 		Function Read(numCharacters as Integer) As String
 		  #if TargetWin32
+		    
 		    Declare Sub ReadConsoleA Lib "Kernel32" ( handle as Integer, buf as Ptr, size as Integer, ByRef read as Integer, reserved as Integer )
 		    
 		    if mConsoleHandles( kStdInIndex ) = 0 then return ""
@@ -313,6 +333,12 @@ Protected Class ConsoleWFS
 		    ReadConsoleA( mConsoleHandles( kStdInIndex ), mb, numCharacters, read, 0 )
 		    
 		    return mb.StringValue( 0, read )
+		    
+		  #else
+		    
+		    #pragma unused numCharacters
+		    return ""
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -320,6 +346,7 @@ Protected Class ConsoleWFS
 	#tag Method, Flags = &h21
 		Private Sub SetupInput(handle as Integer)
 		  #if TargetWin32
+		    
 		    Declare Function SetConsoleMode Lib "Kernel32" ( handle as Integer, mode as Integer ) as Boolean
 		    Declare Sub GetConsoleMode Lib "Kernel32" ( handle as Integer, ByRef mode as Integer )
 		    
@@ -331,6 +358,11 @@ Protected Class ConsoleWFS
 		    oldMode = BitwiseOr( oldMode, ENABLE_MOUSE_INPUT + ENABLE_WINDOW_INPUT )
 		    
 		    dim worked as Boolean = SetConsoleMode( handle, oldMode )
+		    
+		  #else
+		    
+		    #pragma unused handle
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -338,6 +370,7 @@ Protected Class ConsoleWFS
 	#tag Method, Flags = &h0
 		Sub Write(data as String, toErrStream as Boolean = false)
 		  #if TargetWin32
+		    
 		    Dim handle as Integer
 		    
 		    if toErrStream then handle = mConsoleHandles( kStdErrIndex ) else handle = mConsoleHandles( kStdOutIndex )
@@ -348,6 +381,12 @@ Protected Class ConsoleWFS
 		    Dim mb as MemoryBlock = data
 		    Dim written as Integer
 		    WriteConsoleA( handle, mb, mb.Size, written, 0 )
+		    
+		  #else
+		    
+		    #pragma unused data
+		    #pragma unused toErrStream
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -402,6 +441,7 @@ Protected Class ConsoleWFS
 		#tag Setter
 			Set
 			  #if TargetWin32
+			    
 			    Declare Sub SetConsoleMode Lib "Kernel32" ( handle as Integer, mode as Integer )
 			    Declare Sub GetConsoleMode Lib "Kernel32" ( handle as Integer, ByRef mode as Integer )
 			    
@@ -420,6 +460,11 @@ Protected Class ConsoleWFS
 			    end if
 			    
 			    SetConsoleMode( mConsoleHandles( kStdInIndex ), mode )
+			    
+			  #else
+			    
+			    #pragma unused value
+			    
 			  #endif
 			End Set
 		#tag EndSetter
@@ -446,6 +491,7 @@ Protected Class ConsoleWFS
 		#tag Setter
 			Set
 			  #if TargetWin32
+			    
 			    Declare Sub SetConsoleMode Lib "Kernel32" ( handle as Integer, mode as Integer )
 			    Declare Sub GetConsoleMode Lib "Kernel32" ( handle as Integer, ByRef mode as Integer )
 			    
@@ -464,6 +510,11 @@ Protected Class ConsoleWFS
 			    end if
 			    
 			    SetConsoleMode( mConsoleHandles( kStdInIndex ), mode )
+			    
+			  #else
+			    
+			    #pragma unused value
+			    
 			  #endif
 			End Set
 		#tag EndSetter
@@ -516,9 +567,15 @@ Protected Class ConsoleWFS
 		#tag Setter
 			Set
 			  #if TargetWin32
+			    
 			    Declare Sub SetConsoleTitleA Lib "Kernel32" ( yeah as CString )
 			    
 			    SetConsoleTitleA( value )
+			    
+			  #else
+			    
+			    #pragma unused value
+			    
 			  #endif
 			End Set
 		#tag EndSetter

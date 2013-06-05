@@ -147,6 +147,7 @@ Protected Class ToolTipWFS
 	#tag Method, Flags = &h21
 		Private Sub ChangeWindowStyle(flag as Integer, set as Boolean)
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    Dim newFlags as Integer
 		    Dim styleFlags As Integer
@@ -177,6 +178,12 @@ Protected Class ToolTipWFS
 		    styleFlags = SetWindowLong( mWnd, GWL_STYLE, newFlags )
 		    styleFlags = SetWindowPos( mWnd, 0, 0, 0, 0, 0, SWP_NOMOVE +_
 		    SWP_NOSIZE + SWP_NOZORDER + SWP_FRAMECHANGED )
+		    
+		  #else
+		    
+		    #pragma unused flag
+		    #pragma unused set
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -499,6 +506,7 @@ Protected Class ToolTipWFS
 	#tag Method, Flags = &h21
 		Private Function SendMessage(msg as Integer, wParam as Integer, lParam as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Soft Declare Function SendMessageA Lib "User32" ( wnd as Integer, msg as Integer, _
 		    wParam as Integer, lParam as Integer ) as Integer
 		    Soft Declare Function SendMessageW Lib "User32" ( wnd as Integer, msg as Integer, _
@@ -509,6 +517,13 @@ Protected Class ToolTipWFS
 		    else
 		      return SendMessageA( mWnd, msg, wParam, lParam )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod

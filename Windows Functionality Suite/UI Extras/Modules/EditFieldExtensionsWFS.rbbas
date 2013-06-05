@@ -3,6 +3,7 @@ Protected Module EditFieldExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Sub ChangeWindowStyle(w as Integer, flag as Integer, set as Boolean, ex as Boolean = false)
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    Dim newFlags as Integer
 		    Dim styleFlags As Integer
@@ -37,6 +38,14 @@ Protected Module EditFieldExtensionsWFS
 		    styleFlags = SetWindowLong( w, style, newFlags )
 		    styleFlags = SetWindowPos( w, 0, 0, 0, 0, 0, SWP_NOMOVE +_
 		    SWP_NOSIZE + SWP_NOZORDER + SWP_FRAMECHANGED )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused flag
+		    #pragma unused set
+		    #pragma unused ex
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -118,6 +127,7 @@ Protected Module EditFieldExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Function TestWindowStyle(w as Integer, flag as Integer, ex as Boolean = false) As Boolean
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    
 		    Const GWL_STYLE = -16
@@ -135,6 +145,13 @@ Protected Module EditFieldExtensionsWFS
 		    else
 		      return false
 		    end
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused flag
+		    #pragma unused ex
+		    
 		  #endif
 		End Function
 	#tag EndMethod

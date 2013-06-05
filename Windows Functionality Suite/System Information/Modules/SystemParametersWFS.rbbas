@@ -508,9 +508,15 @@ Protected Module SystemParametersWFS
 	#tag Method, Flags = &h21
 		Private Function GetSystemMetrics(type as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Declare Function MyGetSystemMetrics Lib "User32" Alias "GetSystemMetrics" ( type as Integer ) as Integer
 		    
 		    return MyGetSystemMetrics( type )
+		    
+		  #else
+		    
+		    #pragma unused type
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -1388,6 +1394,7 @@ Protected Module SystemParametersWFS
 	#tag Method, Flags = &h21
 		Private Sub SystemParametersInfo(action as Integer, param1 as Integer, oddSet as Boolean, iniChange as Integer)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub SystemParametersInfoA Lib "User32" ( action as Integer, _
 		    param1 as Integer, param2 as Boolean, change as Integer )
 		    Soft Declare Sub SystemParametersInfoW Lib "User32" ( action as Integer, _
@@ -1398,6 +1405,14 @@ Protected Module SystemParametersWFS
 		    else
 		      SystemParametersInfoA( action, param1, oddSet, iniChange )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused action
+		    #pragma unused param1
+		    #pragma unused oddSet
+		    #pragma unused iniChange
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -1405,6 +1420,7 @@ Protected Module SystemParametersWFS
 	#tag Method, Flags = &h21
 		Private Sub SystemParametersInfo(action as Integer, param1 as Integer, param2 as Integer, iniChange as Integer)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub SystemParametersInfoA Lib "User32" ( action as Integer, _
 		    param1 as Integer, param2 as Integer, change as Integer )
 		    Soft Declare Sub SystemParametersInfoW Lib "User32" ( action as Integer, _
@@ -1415,6 +1431,14 @@ Protected Module SystemParametersWFS
 		    else
 		      SystemParametersInfoA( action, param1, param2, iniChange )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused action
+		    #pragma unused param1
+		    #pragma unused param2
+		    #pragma unused iniChange
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
