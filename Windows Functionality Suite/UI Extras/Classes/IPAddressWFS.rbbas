@@ -70,6 +70,7 @@ Protected Class IPAddressWFS
 	#tag Method, Flags = &h0
 		Sub Create(w as Window, x as Integer, y as Integer, width as Integer, height as Integer)
 		  #if TargetWin32
+		    
 		    Soft Declare Function CreateWindowExA Lib "User32" ( _
 		    dwExStyle as Integer, lpClassName as CString, lpWindowName as Integer, _
 		    dwStyle as Integer, x as Integer, y as Integer, width as Integer, height as Integer, _
@@ -101,6 +102,15 @@ Protected Class IPAddressWFS
 		    
 		    Declare Sub ShowWindow Lib "User32" ( hwnd as Integer, style as Integer )
 		    ShowWindow( mWnd, 1 )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused x
+		    #pragma unused y
+		    #pragma unused width
+		    #pragma unused height
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -128,6 +138,7 @@ Protected Class IPAddressWFS
 	#tag Method, Flags = &h21
 		Private Function SendMessage(msg as Integer, wParam as Integer, lParam as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Soft Declare Function SendMessageA Lib "User32" ( wnd as Integer, msg as Integer, _
 		    wParam as Integer, lParam as Integer ) as Integer
 		    Soft Declare Function SendMessageW Lib "User32" ( wnd as Integer, msg as Integer, _
@@ -138,6 +149,13 @@ Protected Class IPAddressWFS
 		    else
 		      return SendMessageA( mWnd, msg, wParam, lParam )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod

@@ -49,6 +49,7 @@ Implements WndProcSubclassWFS
 		  mOwner = owner
 		  
 		  #if TargetWin32
+		    
 		    Declare Sub InitCommonControlsEx Lib "ComCtl32" ( mb as Ptr )
 		    Declare Function GetModuleHandleA Lib "Kernel32" ( zero as Integer ) as Integer
 		    
@@ -101,6 +102,11 @@ Implements WndProcSubclassWFS
 		    
 		    '// Now we need to subclass the window
 		    'WndProcHelpers.Subclass( owner, me )
+		    
+		  #else
+		    
+		    #pragma unused growIcon
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -133,97 +139,106 @@ Implements WndProcSubclassWFS
 
 	#tag Method, Flags = &h21
 		Private Function HICONFromRBPicture(theIcon as Picture) As Integer
-		  // If there's no picture, then there's no HICON
-		  if theIcon = nil then return 0
-		  
-		  // Create our cache if we must
-		  if mIconCache = nil then mIconCache = new Dictionary
-		  
-		  // Check to see if the picture exists in our cache
-		  if mIconCache.HasKey( theIcon ) then return mIconCache.Value( theIcon )
-		  
-		  #if RBVersion < 2010.05
-		    // DISCLAIMER!!!  READ THIS!!!!
-		    // The following declare uses a very unsupported feature in REALbasic.  This means a few
-		    // things.  1) Don't rely on this call working forever -- it's entirely possible that upgrading to
-		    // a new version of REALbasic will cause this declare to break.  2) Don't try to use declares
-		    // into the plugins APIs yourself.  And 3) Since this is not a supported way to use declares, you
-		    // get everything you deserve if you use a declare like this.  You will eventually come down
-		    // with the plague and someone will drink all your beer.  Basically... don't use this sort of thing!
-		    // The declare will be removed as soon as there is a sanctioned way to get this functionality
-		    // from REALbasic.  This declare should (hypothetically) work in 5.5 only (tho it may work in
-		    // version 5 as well).  Consider all other versions of REALbasic unsupported.
-		    Declare Sub REALLockPictureDescription Lib "" ( pic as Picture, desc As Ptr, request as Integer )
-		    Declare Sub unlockPictureDescription Lib "" ( pic as Picture )
-		  #endif
-		  
-		  // We are given an RB Picture object (and it may contain the mask information)
-		  // that we want to turn into an HICON.
-		  
-		  // We will fill out an ICONINFO structure with the proper data, and call
-		  // CreateIconIndirect on it, then store the results in a dictionary so that
-		  // we don't need to do the conversion multiple times.
-		  
-		  dim iconInfo as new MemoryBlock( 20 )
-		  iconInfo.Long( 0 ) = 1  ' We are an Icon, not a cursor
-		  // We can ignore the hotspot information since we're not a cursor
-		  
-		  dim p as Picture = theIcon
-		  
-		  #if RBVersion < 2010.05
-		    // Set the mask HBITMAP
-		    dim maskDesc as new MemoryBlock( 21 )
-		    REALLockPictureDescription( p.Mask, maskDesc, 7 )
-		    if maskDesc.Long( 0 ) = 7 then
-		      iconInfo.Long( 12) = maskDesc.Long( 4 )
-		    end if
+		  #if TargetWin32
 		    
-		    // Set the color HBITMAP
-		    dim picDesc as new MemoryBlock( 21 )
-		    REALLockPictureDescription( p, picDesc, 7 )
-		    if picDesc.Long( 0 ) = 7 then
-		      iconInfo.Long( 16 ) = picDesc.Long( 4 )
-		    end if
+		    // If there's no picture, then there's no HICON
+		    if theIcon = nil then return 0
+		    
+		    // Create our cache if we must
+		    if mIconCache = nil then mIconCache = new Dictionary
+		    
+		    // Check to see if the picture exists in our cache
+		    if mIconCache.HasKey( theIcon ) then return mIconCache.Value( theIcon )
+		    
+		    #if RBVersion < 2010.05
+		      // DISCLAIMER!!!  READ THIS!!!!
+		      // The following declare uses a very unsupported feature in REALbasic.  This means a few
+		      // things.  1) Don't rely on this call working forever -- it's entirely possible that upgrading to
+		      // a new version of REALbasic will cause this declare to break.  2) Don't try to use declares
+		      // into the plugins APIs yourself.  And 3) Since this is not a supported way to use declares, you
+		      // get everything you deserve if you use a declare like this.  You will eventually come down
+		      // with the plague and someone will drink all your beer.  Basically... don't use this sort of thing!
+		      // The declare will be removed as soon as there is a sanctioned way to get this functionality
+		      // from REALbasic.  This declare should (hypothetically) work in 5.5 only (tho it may work in
+		      // version 5 as well).  Consider all other versions of REALbasic unsupported.
+		      Declare Sub REALLockPictureDescription Lib "" ( pic as Picture, desc As Ptr, request as Integer )
+		      Declare Sub unlockPictureDescription Lib "" ( pic as Picture )
+		    #endif
+		    
+		    // We are given an RB Picture object (and it may contain the mask information)
+		    // that we want to turn into an HICON.
+		    
+		    // We will fill out an ICONINFO structure with the proper data, and call
+		    // CreateIconIndirect on it, then store the results in a dictionary so that
+		    // we don't need to do the conversion multiple times.
+		    
+		    dim iconInfo as new MemoryBlock( 20 )
+		    iconInfo.Long( 0 ) = 1  ' We are an Icon, not a cursor
+		    // We can ignore the hotspot information since we're not a cursor
+		    
+		    dim p as Picture = theIcon
+		    
+		    #if RBVersion < 2010.05
+		      // Set the mask HBITMAP
+		      dim maskDesc as new MemoryBlock( 21 )
+		      REALLockPictureDescription( p.Mask, maskDesc, 7 )
+		      if maskDesc.Long( 0 ) = 7 then
+		        iconInfo.Long( 12) = maskDesc.Long( 4 )
+		      end if
+		      
+		      // Set the color HBITMAP
+		      dim picDesc as new MemoryBlock( 21 )
+		      REALLockPictureDescription( p, picDesc, 7 )
+		      if picDesc.Long( 0 ) = 7 then
+		        iconInfo.Long( 16 ) = picDesc.Long( 4 )
+		      end if
+		    #else
+		      // Since REAL Software decided to break Lib "" declares without giving
+		      // any replacement whatsoever for this functionality, we have to go the
+		      // slow route.  We will save the bitmaps out to disk, and then load them
+		      // back up so we can get the handle.
+		      Declare Function LoadImageW Lib "User32" ( hInst as Integer, name as WString, type as Integer, cx as Integer, cy as Integer, load as Integer ) as Integer
+		      
+		      dim main as FolderItem = SpecialFolder.Temporary.Child( "main" )
+		      dim test as Picture
+		      test = p.Mask
+		      p.Mask = nil
+		      
+		      p.Save( main, Picture.SaveAsWindowsBMP )
+		      Const IMAGE_BITMAP = 0
+		      Const LR_LOADFROMFILE = &h10
+		      Const LR_CREATEDIBSECTION = &h2000
+		      iconInfo.Long( 16 ) = LoadImageW( 0, main.AbsolutePath, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
+		      
+		      dim mask as FolderItem = SpecialFolder.Temporary.Child( "mask" )
+		      test.Save( mask, Picture.SaveAsWindowsBMP )
+		      iconInfo.Long( 12 ) = LoadImageW( 0, mask.AbsolutePath, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
+		      
+		      p.Mask = test
+		    #endif
+		    
+		    // Now we can create the HICON
+		    Declare Function CreateIconIndirect Lib "User32" ( indirect as Ptr ) as Integer
+		    dim hicon as Integer = CreateIconIndirect( iconInfo )
+		    
+		    #if RBVersion < 2010.05
+		      // And unlock our picture descriptions
+		      unlockPictureDescription( p.Mask )
+		      unlockPictureDescription( p )
+		    #endif
+		    
+		    // Store the value into our cache
+		    mIconCache.Value( p ) = hicon
+		    
+		    // And return the new HICON
+		    return hicon
+		    
 		  #else
-		    // Since REAL Software decided to break Lib "" declares without giving
-		    // any replacement whatsoever for this functionality, we have to go the
-		    // slow route.  We will save the bitmaps out to disk, and then load them
-		    // back up so we can get the handle.
-		    Declare Function LoadImageW Lib "User32" ( hInst as Integer, name as WString, type as Integer, cx as Integer, cy as Integer, load as Integer ) as Integer
 		    
-		    dim main as FolderItem = SpecialFolder.Temporary.Child( "main" )
-		    dim test as Picture
-		    test = p.Mask
-		    p.Mask = nil
+		    #pragma unused theIcon
 		    
-		    p.Save( main, Picture.SaveAsWindowsBMP )
-		    Const IMAGE_BITMAP = 0
-		    Const LR_LOADFROMFILE = &h10
-		    Const LR_CREATEDIBSECTION = &h2000
-		    iconInfo.Long( 16 ) = LoadImageW( 0, main.AbsolutePath, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
-		    
-		    dim mask as FolderItem = SpecialFolder.Temporary.Child( "mask" )
-		    test.Save( mask, Picture.SaveAsWindowsBMP )
-		    iconInfo.Long( 12 ) = LoadImageW( 0, mask.AbsolutePath, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
-		    
-		    p.Mask = test
 		  #endif
 		  
-		  // Now we can create the HICON
-		  Declare Function CreateIconIndirect Lib "User32" ( indirect as Ptr ) as Integer
-		  dim hicon as Integer = CreateIconIndirect( iconInfo )
-		  
-		  #if RBVersion < 2010.05
-		    // And unlock our picture descriptions
-		    unlockPictureDescription( p.Mask )
-		    unlockPictureDescription( p )
-		  #endif
-		  
-		  // Store the value into our cache
-		  mIconCache.Value( p ) = hicon
-		  
-		  // And return the new HICON
-		  return hicon
 		End Function
 	#tag EndMethod
 
@@ -232,13 +247,12 @@ Implements WndProcSubclassWFS
 		  // ADDED BY Carlos Martinho (2006-SEP-10)
 		  // To hide the status bar
 		  
-		  dim e as integer
-		  
 		  #if TargetWin32
 		    
 		    const SW_HIDE = 0
 		    Declare Function ShowWindow Lib "user32" (hwnd as Integer, nCmdShow as Integer) as Integer
 		    
+		    dim e as integer
 		    if hWnd <> 0 then
 		      e = ShowWindow( hWnd, SW_HIDE )
 		    end
@@ -313,6 +327,7 @@ Implements WndProcSubclassWFS
 	#tag Method, Flags = &h1
 		Protected Sub SendMessage(msg as Integer, wParam as Integer, lParam as Integer)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub SendMessageA Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer )
 		    Soft Declare Function SendMessageW Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer ) as Integer
 		    
@@ -323,6 +338,13 @@ Implements WndProcSubclassWFS
 		    else
 		      SendMessageA( hWnd, msg, wParam, lParam )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -330,6 +352,7 @@ Implements WndProcSubclassWFS
 	#tag Method, Flags = &h1
 		Protected Sub SendMessage(msg as Integer, wParam as Integer, lParam as Ptr)
 		  #if TargetWin32
+		    
 		    Soft Declare Sub SendMessageA Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Ptr )
 		    Soft Declare Function SendMessageW Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Ptr ) as Integer
 		    
@@ -340,39 +363,44 @@ Implements WndProcSubclassWFS
 		    else
 		      SendMessageA( hWnd, msg, wParam, lParam )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SetIcon(part as Integer, theIcon as Picture)
-		  #if TargetWin32
-		    Const SB_SETICON = &h40F
-		    
-		    dim icon as Integer
-		    icon = HICONFromRBPicture( theIcon )
-		    
-		    SendMessage( SB_SETICON, part, icon )
-		  #endif
+		  Const SB_SETICON = &h40F
+		  
+		  dim icon as Integer
+		  icon = HICONFromRBPicture( theIcon )
+		  
+		  SendMessage( SB_SETICON, part, icon )
+		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SetText(str as String, partNum as Integer = 0, raisedText as Boolean = false)
-		  #if TargetWin32
-		    Const SB_SETTEXTA = &h401
-		    Const SB_SETTEXTW = &h40B
-		    Const SBT_POPOUT = &h200
-		    
-		    dim thewParam as Integer = partNum
-		    if raisedText then thewParam = Bitwise.BitOr( thewParam, SBT_POPOUT )
-		    
-		    if mUnicodeSavvy then
-		      SendMessage( SB_SETTEXTW, thewParam, StrToLPStr( str ) )
-		    else
-		      SendMessage( SB_SETTEXTA, thewParam, StrToLPStr( str ) )
-		    end if
-		  #endif
+		  Const SB_SETTEXTA = &h401
+		  Const SB_SETTEXTW = &h40B
+		  Const SBT_POPOUT = &h200
+		  
+		  dim thewParam as Integer = partNum
+		  if raisedText then thewParam = Bitwise.BitOr( thewParam, SBT_POPOUT )
+		  
+		  if mUnicodeSavvy then
+		    SendMessage( SB_SETTEXTW, thewParam, StrToLPStr( str ) )
+		  else
+		    SendMessage( SB_SETTEXTA, thewParam, StrToLPStr( str ) )
+		  end if
+		  
 		End Sub
 	#tag EndMethod
 
@@ -380,23 +408,22 @@ Implements WndProcSubclassWFS
 		Sub SetTextCenter(str as String, partNum as Integer = 0, raisedText as Boolean = false)
 		  // ADDED BY Carlos Martinho (2006-SEP-10) (just the part to center text)
 		  
-		  #if TargetWin32
-		    Const SB_SETTEXTA = &h401
-		    Const SB_SETTEXTW = &h40B
-		    Const SBT_POPOUT = &h200
-		    
-		    // To center align text: one tab before text
-		    str = Chr(9) + str
-		    
-		    dim thewParam as Integer = partNum
-		    if raisedText then thewParam = Bitwise.BitOr( thewParam, SBT_POPOUT )
-		    
-		    if mUnicodeSavvy then
-		      SendMessage( SB_SETTEXTW, thewParam, StrToLPStr( str ) )
-		    else
-		      SendMessage( SB_SETTEXTA, thewParam, StrToLPStr( str ) )
-		    end if
-		  #endif
+		  Const SB_SETTEXTA = &h401
+		  Const SB_SETTEXTW = &h40B
+		  Const SBT_POPOUT = &h200
+		  
+		  // To center align text: one tab before text
+		  str = Chr(9) + str
+		  
+		  dim thewParam as Integer = partNum
+		  if raisedText then thewParam = Bitwise.BitOr( thewParam, SBT_POPOUT )
+		  
+		  if mUnicodeSavvy then
+		    SendMessage( SB_SETTEXTW, thewParam, StrToLPStr( str ) )
+		  else
+		    SendMessage( SB_SETTEXTA, thewParam, StrToLPStr( str ) )
+		  end if
+		  
 		End Sub
 	#tag EndMethod
 
@@ -406,23 +433,22 @@ Implements WndProcSubclassWFS
 		  // Used only to set text on a simple mode status bar
 		  // The partNum is fixed to 255 - must be 255 to set text on simple mode
 		  
-		  #if TargetWin32
-		    Const SB_SETTEXTA = &h401
-		    Const SB_SETTEXTW = &h40B
-		    Const SBT_POPOUT = &h200
-		    
-		    // Check if is to center text
-		    If centerText Then str = Chr(9) + str
-		    
-		    dim thewParam as Integer = 255 // simple mode
-		    if raisedText then thewParam = Bitwise.BitOr( thewParam, SBT_POPOUT )
-		    
-		    if mUnicodeSavvy then
-		      SendMessage( SB_SETTEXTW, thewParam, StrToLPStr( str ) )
-		    else
-		      SendMessage( SB_SETTEXTA, thewParam, StrToLPStr( str ) )
-		    end if
-		  #endif
+		  Const SB_SETTEXTA = &h401
+		  Const SB_SETTEXTW = &h40B
+		  Const SBT_POPOUT = &h200
+		  
+		  // Check if is to center text
+		  If centerText Then str = Chr(9) + str
+		  
+		  dim thewParam as Integer = 255 // simple mode
+		  if raisedText then thewParam = Bitwise.BitOr( thewParam, SBT_POPOUT )
+		  
+		  if mUnicodeSavvy then
+		    SendMessage( SB_SETTEXTW, thewParam, StrToLPStr( str ) )
+		  else
+		    SendMessage( SB_SETTEXTA, thewParam, StrToLPStr( str ) )
+		  end if
+		  
 		End Sub
 	#tag EndMethod
 
@@ -430,23 +456,22 @@ Implements WndProcSubclassWFS
 		Sub SetTextRight(str as String, partNum as Integer = 0, raisedText as Boolean = false)
 		  // ADDED BY Carlos Martinho (2006-SEP-10) (just the part to rigth align text)
 		  
-		  #if TargetWin32
-		    Const SB_SETTEXTA = &h401
-		    Const SB_SETTEXTW = &h40B
-		    Const SBT_POPOUT = &h200
-		    
-		    // To right align text: two tabs before text
-		    str = Chr(9) + Chr(9) + str
-		    
-		    dim thewParam as Integer = partNum
-		    if raisedText then thewParam = Bitwise.BitOr( thewParam, SBT_POPOUT )
-		    
-		    if mUnicodeSavvy then
-		      SendMessage( SB_SETTEXTW, thewParam, StrToLPStr( str ) )
-		    else
-		      SendMessage( SB_SETTEXTA, thewParam, StrToLPStr( str ) )
-		    end if
-		  #endif
+		  Const SB_SETTEXTA = &h401
+		  Const SB_SETTEXTW = &h40B
+		  Const SBT_POPOUT = &h200
+		  
+		  // To right align text: two tabs before text
+		  str = Chr(9) + Chr(9) + str
+		  
+		  dim thewParam as Integer = partNum
+		  if raisedText then thewParam = Bitwise.BitOr( thewParam, SBT_POPOUT )
+		  
+		  if mUnicodeSavvy then
+		    SendMessage( SB_SETTEXTW, thewParam, StrToLPStr( str ) )
+		  else
+		    SendMessage( SB_SETTEXTA, thewParam, StrToLPStr( str ) )
+		  end if
+		  
 		End Sub
 	#tag EndMethod
 
@@ -489,13 +514,13 @@ Implements WndProcSubclassWFS
 		  // ADDED BY Carlos Martinho (2006-SEP-10)
 		  // To show the status bar
 		  
-		  dim e as integer
-		  
 		  #if TargetWin32
 		    
 		    const SW_NORMAL = 1
+		    
 		    Declare Function ShowWindow Lib "user32" (hwnd as Integer, nCmdShow as Integer) as Integer
 		    
+		    dim e as integer
 		    if hWnd <> 0 then
 		      e = ShowWindow( hWnd, SW_NORMAL )
 		    end
@@ -617,6 +642,9 @@ Implements WndProcSubclassWFS
 		  // Note that we return false always, that's because we're not
 		  // changing anything -- just peeking at it
 		  return false
+		  
+		  #pragma unused hWnd
+		  #pragma unused returnValue // Was this an oversight? -KT 
 		End Function
 	#tag EndMethod
 

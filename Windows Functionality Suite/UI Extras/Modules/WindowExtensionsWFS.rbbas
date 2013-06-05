@@ -3,6 +3,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Function Alpha(extends w as Window) As Single
 		  #if TargetWin32
+		    
 		    Const LWA_ALPHA = 2
 		    Soft Declare Sub GetLayeredWindowAttributes Lib "user32" ( hwnd As Integer, thecolor As Integer, ByRef bAlpha As integer, flags As Integer )
 		    
@@ -12,6 +13,12 @@ Protected Module WindowExtensionsWFS
 		    GetLayeredWindowAttributes( w.WinHWND, 0 , alpha, LWA_ALPHA )
 		    
 		    return alpha / 255.0
+		    
+		  #else
+		    
+		    #pragma unused w
+		    return 0.
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -19,6 +26,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub Alpha(extends w as Window, assigns alpha as Single)
 		  #if TargetWin32
+		    
 		    // First, check to see if we've set this window up to be layered yet
 		    Const WS_EX_LAYERED = &H80000
 		    Const LWA_ALPHA = 2
@@ -38,6 +46,11 @@ Protected Module WindowExtensionsWFS
 		      SetLayeredWindowAttributes( w.WinHWND, 0 , value, LWA_ALPHA )
 		    end if
 		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused alpha
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -45,7 +58,8 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub AnimateWindow(extends w as Window, microsecs as Integer, flags as Integer)
 		  'More info at http://www.developersdomain.com/vb/codesnippets/windows.htm
-		  #if targetWin32 then
+		  #if TargetWin32 then
+		    
 		    Declare Sub AnimateWindow Lib "user32" ( hwnd As Integer, dwTime As Integer, dwFlags As Integer )
 		    
 		    AnimateWindow( w.WinHWND, microsecs, flags )
@@ -55,15 +69,23 @@ Protected Module WindowExtensionsWFS
 		    else
 		      w.Refresh( false )
 		    end
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused microsecs
+		    #pragma unused flags
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub BringToFront(extends w as Window)
-		  Dim i, h, r As Integer
-		  
 		  #if TargetWin32
+		    
+		    Dim i, h, r As Integer
+		    
 		    if not w.visible then
 		      w.visible = true
 		    end if
@@ -84,6 +106,11 @@ Protected Module WindowExtensionsWFS
 		    i = BringWindowToTop( h )
 		    i = SetForegroundWindow( h )
 		    w.FlashWindowEx( 3 )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -91,9 +118,16 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub ChangeWindowState(extends wnd as Window, style as Integer)
 		  #if TargetWin32
+		    
 		    Declare Sub ShowWindow Lib "User32" (wnd As Integer, nCmdShow As Integer)
 		    
 		    ShowWindow( wnd.WinHWND, style )
+		    
+		  #else
+		    
+		    #pragma unused wnd
+		    #pragma unused style
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -101,6 +135,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Sub ChangeWindowStyle(w as Window, flag as Integer, set as Boolean)
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    Dim newFlags as Integer
 		    Dim styleFlags As Integer
@@ -131,6 +166,13 @@ Protected Module WindowExtensionsWFS
 		    styleFlags = SetWindowLong( w.WinHWND, GWL_STYLE, newFlags )
 		    styleFlags = SetWindowPos( w.WinHWND, 0, 0, 0, 0, 0, SWP_NOMOVE +_
 		    SWP_NOSIZE + SWP_NOZORDER + SWP_FRAMECHANGED )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused flag
+		    #pragma unused set
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -138,6 +180,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Sub ChangeWindowStyleEx(w as Window, flag as Integer, set as Boolean)
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    Dim newFlags as Integer
 		    Dim styleFlags As Integer
@@ -168,6 +211,13 @@ Protected Module WindowExtensionsWFS
 		    styleFlags = SetWindowLong( w.WinHWND, GWL_EXSTYLE, newFlags )
 		    styleFlags = SetWindowPos( w.WinHWND, 0, 0, 0, 0, 0, SWP_NOMOVE +_
 		    SWP_NOSIZE + SWP_NOZORDER + SWP_FRAMECHANGED )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused flag
+		    #pragma unused set
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -175,6 +225,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Function CloseButtonState(extends w as Window) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function GetSystemMenu Lib "User32" ( wnd as Integer, revert as Boolean ) as Integer
 		    Declare Function GetMenuState Lib "User32" ( menu as Integer, which as Integer, flags as Integer ) as Integer
 		    
@@ -191,6 +242,11 @@ Protected Module WindowExtensionsWFS
 		    state = GetMenuState( menu, SC_CLOSE, MF_BYCOMMAND )
 		    
 		    return Bitwise.BitAnd( state, MF_DISABLED + MF_GRAYED ) = 0
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -198,6 +254,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub CloseButtonState(extends w as Window, assigns enabled as Boolean)
 		  #if TargetWin32
+		    
 		    Declare Function GetSystemMenu Lib "User32" ( wnd as Integer, revert as Boolean ) as Integer
 		    Declare Sub EnableMenuItem Lib "User32" ( menu as Integer, which as Integer, flags as Integer )
 		    
@@ -214,6 +271,12 @@ Protected Module WindowExtensionsWFS
 		    else
 		      EnableMenuItem( menu, SC_CLOSE, MF_BYCOMMAND + MF_ENABLED )
 		    end
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused enabled
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -232,11 +295,17 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub FlashWindow(Extends win as window)
 		  #if TargetWin32
+		    
 		    //works on windows 95+
 		    dim res as integer
 		    Declare Function FlashWindow Lib "user32" (hwnd As integer, bInvert As integer) As integer
 		    Const Invert = 1
 		    res = FlashWindow(win.winhwnd,Invert)
+		    
+		  #else
+		    
+		    #pragma unused win
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -244,6 +313,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub FlashWindowEx(Extends win as window, x as integer)
 		  #if TargetWin32
+		    
 		    //requires windows 98 or higher
 		    Const FLASHW_STOP = 0 'Stop flashing. The system restores the window to its original state.
 		    Const FLASHW_CAPTION = &H1 'Flash the window caption.
@@ -274,6 +344,12 @@ Protected Module WindowExtensionsWFS
 		    if FlashWindowEx(FlashInfo) =0 then
 		      ///succeeded
 		    end
+		    
+		  #else
+		    
+		    #pragma unused win
+		    #pragma unused x
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -281,6 +357,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub FreezeUpdate(extends w as Window)
 		  #if TargetWin32
+		    
 		    // This is incorrect and should only be used for drag and drop operations
 		    // on ancient versions of Windows that REALbasic doesn't even support
 		    'Declare Sub LockWindowUpdate Lib "User32" ( hwnd as Integer )
@@ -291,6 +368,11 @@ Protected Module WindowExtensionsWFS
 		    // state of the window (note that this can be used for controls as well)
 		    Const WM_SETREDRAW = &hB
 		    call SendMessage( w.Handle, WM_SETREDRAW, 0, 0 )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -298,6 +380,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Sub GetWindowRect(w as Window, ByRef trueLeft as Integer, ByRef trueTop as Integer, ByRef trueRight as Integer, ByRef trueBottom as Integer)
 		  #if TargetWin32
+		    
 		    Declare Sub MyGetWindowRect Lib "User32" Alias "GetWindowRect" ( w as WindowPtr, r as Ptr )
 		    
 		    dim r as new MemoryBlock( 16 )
@@ -307,6 +390,15 @@ Protected Module WindowExtensionsWFS
 		    trueTop = r.Long( 4 )
 		    trueRight = r.Long( 8 )
 		    trueBottom = r.Long( 12 )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused trueLeft
+		    #pragma unused trueTop
+		    #pragma unused trueRight
+		    #pragma unused trueBottom
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -486,6 +578,7 @@ Protected Module WindowExtensionsWFS
 		  Const ICON_SMALL = 0
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Sub SendMessageA Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer )
 		    Soft Declare Sub SendMessageW Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer )
 		    
@@ -495,6 +588,12 @@ Protected Module WindowExtensionsWFS
 		    else
 		      SendMessageA( w.Handle, WM_SETICON, ICON_SMALL, HICONFromRBPicture( newIcon ) )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused newIcon
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -511,9 +610,15 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Function IsMaximized(extends w as Window) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function IsZoomed Lib "User32" ( hwnd As Integer ) As Integer
 		    
 		    return IsZoomed( w.Handle ) <> 0
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -521,9 +626,15 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Function IsMinimized(extends w as Window) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function IsIconic Lib "User32" ( hwnd As Integer ) As Integer
 		    
 		    return IsIconic( w.Handle ) <> 0
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -546,6 +657,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Function Mask(extends w as Window) As Color
 		  #if TargetWin32
+		    
 		    Const LWA_COLOR_KEY = 2
 		    Soft Declare Sub GetLayeredWindowAttributes Lib "user32" ( hwnd As Integer, ByRef thecolor As Integer, bAlpha As integer, flags As Integer )
 		    
@@ -555,6 +667,11 @@ Protected Module WindowExtensionsWFS
 		    GetLayeredWindowAttributes( w.WinHWND, theColor, 0, LWA_COLOR_KEY)
 		    
 		    return IntToColor( theColor )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -570,12 +687,19 @@ Protected Module WindowExtensionsWFS
 		    ChangeWindowStyleEx( w, WS_EX_LAYERED, true )
 		  end
 		  
-		  #if targetWin32 then
+		  #if TargetWin32 then
+		    
 		    Soft Declare Sub SetLayeredWindowAttributes Lib "user32" ( hwnd As Integer, thecolor As Integer, bAlpha As integer, alpha As Integer )
 		    
 		    if System.IsFunctionAvailable( "SetLayeredWindowAttributes", "User32" ) then
 		      SetLayeredWindowAttributes( w.WinHWND, ColorToInt( c ), 0, LWA_COLORKEY )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused c
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -599,6 +723,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Function SendMessage(hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Soft Declare Function SendMessageA Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer ) as Integer
 		    Soft Declare Function SendMessageW Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer ) as Integer
 		    
@@ -607,6 +732,14 @@ Protected Module WindowExtensionsWFS
 		    else
 		      return SendMessageA( hwnd, msg, wParam, lParam )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused hwnd
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -614,6 +747,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Sub SetWindowPos(w as Window, x as Integer, y as Integer)
 		  #if TargetWin32
+		    
 		    Const SWP_NOSIZE = &H1
 		    Const SWP_NOMOVE = &H2
 		    Const SWP_NOZORDER = &H4
@@ -622,6 +756,13 @@ Protected Module WindowExtensionsWFS
 		    x as Integer, y as Integer, cx as Integer, cy as Integer, flags as Integer )
 		    
 		    MySetWindowPos( w.Handle, 0, x, y, 0, 0, SWP_NOSIZE + SWP_NOZORDER )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused x
+		    #pragma unused y
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -629,6 +770,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Function TestWindowStyle(w as Window, flag as Integer) As Boolean
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    
 		    Const GWL_STYLE = -16
@@ -643,6 +785,12 @@ Protected Module WindowExtensionsWFS
 		    else
 		      return false
 		    end
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused flag
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -650,6 +798,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h21
 		Private Function TestWindowStyleEx(w as Window, flag as Integer) As Boolean
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    
 		    Const GWL_EXSTYLE = -20
@@ -664,6 +813,12 @@ Protected Module WindowExtensionsWFS
 		    else
 		      return false
 		    end
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused flag
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -678,6 +833,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub Topmost(extends w as Window, assigns set as Boolean)
 		  #if TargetWin32
+		    
 		    Const WS_EX_TOPMOST = &h00000008
 		    ChangeWindowStyleEx( w, WS_EX_TOPMOST, set )
 		    
@@ -696,6 +852,12 @@ Protected Module WindowExtensionsWFS
 		      after = HWND_NOTOPMOST
 		    end
 		    Call SetWindowPos( w.WinHWND, after, 0, 0, 0, 0, SWP_NOMOVE + SWP_NOSIZE )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused set
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -751,6 +913,7 @@ Protected Module WindowExtensionsWFS
 	#tag Method, Flags = &h0
 		Sub UnfreezeUpdate(extends w as Window)
 		  #if TargetWin32
+		    
 		    // This is incorrect and should only be used for drag and drop operations
 		    // on ancient versions of Windows that REALbasic doesn't even support
 		    'Declare Sub LockWindowUpdate Lib "User32" ( hwnd as Integer )
@@ -761,6 +924,11 @@ Protected Module WindowExtensionsWFS
 		    // state of the window (note that this can be used for controls as well)
 		    Const WM_SETREDRAW = &hB
 		    call SendMessage( w.Handle, WM_SETREDRAW, 1, 0 )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

@@ -57,6 +57,7 @@ Protected Module WndProcHelpersWFS
 	#tag Method, Flags = &h21
 		Private Sub SubclassHelper(w as Integer, subber as WndProcSubclassWFS)
 		  #if TargetWin32
+		    
 		    // First, if we don't have a list of WndProcs to care
 		    // about, we need to make a new list
 		    if mWndProcs = nil then mWndProcs = new Dictionary
@@ -98,6 +99,12 @@ Protected Module WndProcHelpersWFS
 		    dim d as new Dictionary
 		    d.Value( w ) = subber
 		    mSubclasses.Append( d )
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused subber
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -123,6 +130,7 @@ Protected Module WndProcHelpersWFS
 	#tag Method, Flags = &h21
 		Private Sub UnsubclassHelper(w as Integer, subber as WndProcSubclassWFS)
 		  #if TargetWin32
+		    
 		    // First, if we don't have a list of WndProcs to care
 		    // about, we are done
 		    if mWndProcs = nil then return
@@ -168,6 +176,12 @@ Protected Module WndProcHelpersWFS
 		        mSubclasses.Remove( i )
 		      end
 		    next
+		    
+		  #else
+		    
+		    #pragma unused w
+		    #pragma unused subber
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -175,6 +189,7 @@ Protected Module WndProcHelpersWFS
 	#tag Method, Flags = &h21
 		Private Function WndProc(hWnd as Integer, msg as Integer, wParam as Integer, lParam as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Soft Declare Function CallWindowProcA Lib "User32" ( wndProc as Integer, hwnd as Integer, _
 		    msg as Integer, wParam as Integer, lParam as Integer ) as Integer
 		    Soft Declare Function CallWindowProcW Lib "User32" ( wndProc as Integer, hwnd as Integer, _
@@ -199,6 +214,14 @@ Protected Module WndProcHelpersWFS
 		        return CallWindowProcA( nextWndProc, hWnd, msg, wParam, lParam )
 		      end if
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused hWnd
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod

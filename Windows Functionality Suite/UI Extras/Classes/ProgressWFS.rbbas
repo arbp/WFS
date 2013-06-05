@@ -3,7 +3,9 @@ Protected Class ProgressWFS
 	#tag Method, Flags = &h0
 		Sub Attach(w as Window)
 		  #if TargetWin32
+		    
 		    Const PROGRESS_CLASS = "msctls_progress32"
+		    
 		    Soft Declare Function CreateWindowExA Lib "User32" ( ex as Integer, _
 		    className as CString, windowName as CString,  style as Integer, _
 		    x as Integer, y as Integer, cx as Integer, cy as Integer, _
@@ -68,6 +70,11 @@ Protected Class ProgressWFS
 		    if mBackColor <> &c777777 then
 		      me.BackColor = mBackColor
 		    end
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -213,6 +220,7 @@ Protected Class ProgressWFS
 		  if mWnd = 0 then return 0
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Function SendMessageA Lib "User32" ( hWnd as Integer, _
 		    msg as Integer, wParam as Integer, lParam as Integer ) as Integer
 		    Soft Declare Function SendMessageW Lib "User32" ( hWnd as Integer, _
@@ -223,6 +231,13 @@ Protected Class ProgressWFS
 		    else
 		      return SendMessageA( mWnd, msg, wParam, lParam )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod

@@ -3,6 +3,7 @@ Protected Class InternetSessionWFS
 	#tag Method, Flags = &h1
 		Protected Sub CloseHandle(ByRef handle as Integer)
 		  #if TargetWin32
+		    
 		    Declare Sub InternetCloseHandle Lib "WinInet" ( handle as Integer )
 		    
 		    if handle <> 0 then
@@ -10,6 +11,11 @@ Protected Class InternetSessionWFS
 		    end if
 		    
 		    handle = 0
+		    
+		  #else
+		    
+		    #pragma unused handle
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -17,6 +23,7 @@ Protected Class InternetSessionWFS
 	#tag Method, Flags = &h1
 		Protected Sub Constructor(userAgent as String)
 		  #if TargetWin32
+		    
 		    Soft Declare Function InternetOpenA Lib "WinInet" ( agent as CString, access as Integer, _
 		    proxy as Integer, bypass as Integer, flags as Integer ) as Integer
 		    Soft Declare Function InternetOpenW Lib "WinInet" ( agent as WString, access as Integer, _
@@ -34,6 +41,11 @@ Protected Class InternetSessionWFS
 		      FireException( "Could not open the handle" )
 		      return
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused userAgent
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -47,6 +59,7 @@ Protected Class InternetSessionWFS
 	#tag Method, Flags = &h1
 		Protected Function ExtendedErrorInfo(ByRef errNum as Integer) As String
 		  #if TargetWin32
+		    
 		    Soft Declare Sub InternetGetLastResponseInfoW Lib "WinInet" ( ByRef errorNum as Integer, buf as Ptr, ByRef len as Integer )
 		    Soft Declare Sub InternetGetLastResponseInfoA Lib "WinInet" ( ByRef errorNum as Integer, buf as Ptr, ByRef len as Integer )
 		    
@@ -62,6 +75,12 @@ Protected Class InternetSessionWFS
 		      
 		      return buf.StringValue( 0, size )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused errNum
+		    return ""
+		    
 		  #endif
 		End Function
 	#tag EndMethod

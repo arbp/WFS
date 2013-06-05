@@ -3,6 +3,7 @@ Protected Class CalendarWFS
 	#tag Method, Flags = &h21
 		Private Sub ChangeWindowStyle(flag as Integer, set as Boolean)
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    Dim newFlags as Integer
 		    Dim styleFlags As Integer
@@ -33,6 +34,12 @@ Protected Class CalendarWFS
 		    styleFlags = SetWindowLong( mWnd, GWL_STYLE, newFlags )
 		    styleFlags = SetWindowPos( mWnd, 0, 0, 0, 0, 0, SWP_NOMOVE +_
 		    SWP_NOSIZE + SWP_NOZORDER + SWP_FRAMECHANGED )
+		    
+		  #else
+		    
+		    #pragma unused flag
+		    #pragma unused set
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -82,6 +89,7 @@ Protected Class CalendarWFS
 	#tag Method, Flags = &h0
 		Sub Create(onWindow as Window, x as Integer, y as Integer)
 		  #if TargetWin32
+		    
 		    Const MONTHCAL_CLASS = "SysMonthCal32"
 		    
 		    Soft Declare Function CreateWindowExA Lib "User32" ( ex as Integer, className as CString, _
@@ -129,6 +137,12 @@ Protected Class CalendarWFS
 		    Const SWP_NOZORDER = &h4
 		    SetWindowPos( mWnd, 0, x, y, r.Long( 8 ), r.Long( 12 ), SWP_NOZORDER )
 		    
+		  #else
+		    
+		    #pragma unused onWindow
+		    #pragma unused x
+		    #pragma unused y
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -161,10 +175,9 @@ Protected Class CalendarWFS
 
 	#tag Method, Flags = &h0
 		Function GetColor(which as Integer) As Color
-		  #if TargetWin32
-		    Dim MCM_GETCOLOR as Integer = MCM_FIRST + 11
-		    return IntToColor( SendMessage( MCM_GETCOLOR, which, 0 ) )
-		  #endif
+		  Dim MCM_GETCOLOR as Integer = MCM_FIRST + 11
+		  return IntToColor( SendMessage( MCM_GETCOLOR, which, 0 ) )
+		  
 		End Function
 	#tag EndMethod
 
@@ -212,18 +225,17 @@ Protected Class CalendarWFS
 
 	#tag Method, Flags = &h0
 		Sub SelectedDate(assigns d as Date)
-		  #if TargetWin32
-		    Dim MCM_SETCURSEL as Integer = MCM_FIRST + 2
-		    
-		    
-		    Call SendMessage( MCM_SETCURSEL, 0, MemoryBlockToInteger( RBDateToSystemTime( d ) ) )
-		  #endif
+		  Dim MCM_SETCURSEL as Integer = MCM_FIRST + 2
+		  
+		  Call SendMessage( MCM_SETCURSEL, 0, MemoryBlockToInteger( RBDateToSystemTime( d ) ) )
+		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function SendMessage(msg as Integer, wParam as Integer, lParam as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Soft Declare Function SendMessageA Lib "User32" ( wnd as Integer, msg as Integer, _
 		    wParam as Integer, lParam as Integer ) as Integer
 		    Soft Declare Function SendMessageW Lib "User32" ( wnd as Integer, msg as Integer, _
@@ -234,16 +246,22 @@ Protected Class CalendarWFS
 		    else
 		      return SendMessageA( mWnd, msg, wParam, lParam )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub SetColor(which as Integer, assigns c as Color)
-		  #if TargetWin32
-		    Dim MCM_SETCOLOR as Integer = MCM_FIRST + 10
-		    Call SendMessage( MCM_SETCOLOR, which, ColorToInt( c ) )
-		  #endif
+		  Dim MCM_SETCOLOR as Integer = MCM_FIRST + 10
+		  Call SendMessage( MCM_SETCOLOR, which, ColorToInt( c ) )
+		  
 		End Sub
 	#tag EndMethod
 
@@ -261,6 +279,7 @@ Protected Class CalendarWFS
 	#tag Method, Flags = &h21
 		Private Function TestWindowStyle(flag as Integer) As Boolean
 		  #if TargetWin32
+		    
 		    Dim oldFlags as Integer
 		    
 		    Const GWL_STYLE = -16
@@ -275,6 +294,11 @@ Protected Class CalendarWFS
 		    else
 		      return false
 		    end
+		    
+		  #else
+		    
+		    #pragma unused flag
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -293,10 +317,9 @@ Protected Class CalendarWFS
 
 	#tag Method, Flags = &h0
 		Sub Today(assigns d as Date)
-		  #if TargetWin32
-		    Dim MCM_SETTODAY as Integer = MCM_FIRST + 12
-		    Call SendMessage( MCM_SETTODAY, 0, MemoryBlockToInteger( RBDateToSystemTime( d ) ) )
-		  #endif
+		  Dim MCM_SETTODAY as Integer = MCM_FIRST + 12
+		  Call SendMessage( MCM_SETTODAY, 0, MemoryBlockToInteger( RBDateToSystemTime( d ) ) )
+		  
 		End Sub
 	#tag EndMethod
 
