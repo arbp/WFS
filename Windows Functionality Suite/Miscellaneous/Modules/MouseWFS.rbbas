@@ -71,6 +71,7 @@ Protected Module MouseWFS
 	#tag Method, Flags = &h1
 		Protected Sub MoveMouse(x as Integer, y as Integer, absolute as Boolean = false)
 		  #if TargetWin32
+		    
 		    Declare Sub mouse_event Lib "User32" ( flags as Integer, _
 		    dx as Integer, dy as Integer, data as Integer, ByRef extra as Integer )
 		    
@@ -91,6 +92,13 @@ Protected Module MouseWFS
 		      y = (y / Screen( 0 ).Height ) * 65535
 		    end
 		    mouse_event( flags, x, y, 0, extra )
+		    
+		  #else
+		    
+		    #pragma unused x
+		    #pragma unused y
+		    #pragma unused absolute
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -132,6 +140,7 @@ Protected Module MouseWFS
 	#tag Method, Flags = &h1
 		Protected Sub SpinMouseWheel(delta as Integer)
 		  #if TargetWin32
+		    
 		    Declare Sub mouse_event Lib "User32" ( flags as Integer, _
 		    dx as Integer, dy as Integer, data as Integer, ByRef extra as Integer )
 		    
@@ -142,6 +151,11 @@ Protected Module MouseWFS
 		    flags = MOUSEEVENTF_WHEEL
 		    
 		    mouse_event( flags, 0, 0, delta, extra )
+		    
+		  #else
+		    
+		    #pragma unused delta
+		    
 		  #endif
 		End Sub
 	#tag EndMethod

@@ -634,6 +634,7 @@ Protected Module PlugAndPlayWFS
 	#tag Method, Flags = &h0
 		Function PlugAndPlayWndProc(hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer) As Integer
 		  #if TargetWin32
+		    
 		    Const WM_DEVICECHANGE = &h0219
 		    
 		    // We will get a msg of WM_DEVICECHANGE
@@ -671,6 +672,14 @@ Protected Module PlugAndPlayWFS
 		    else
 		      return DefWindowProcA( hwnd, msg, wParam, lParam )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused hwnd
+		    #pragma unused msg
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod
