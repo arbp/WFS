@@ -3,6 +3,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function CompressData(data as MemoryBlock) As MemoryBlock
 		  #if TargetWin32
+		    
 		    Soft Declare Sub RtlCompressBuffer Lib "ntdll" ( format as Integer, data as Ptr, length as Integer, _
 		    destBuffer as Ptr, destLength as Integer, unknown as Integer, ByRef destSize as Integer, _
 		    workspaceBuffer as Ptr )
@@ -28,6 +29,11 @@ Protected Module Win32DeclareLibraryWFS
 		    ret.Size = neededSize
 		    
 		    return ret
+		    
+		  #else
+		    
+		    #pragma unused data
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -74,6 +80,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function DecompressData(data as MemoryBlock, bufferSize as Integer = 10485760) As MemoryBlock
 		  #if TargetWin32
+		    
 		    Soft Declare Sub RtlDecompressBuffer Lib "ntdll" ( format as Integer, destBuffer as Ptr, _
 		    destLength as Integer, sourceBuffer as Ptr, sourceLength as Integer, ByRef _
 		    destSizeNeeded as Integer )
@@ -87,6 +94,12 @@ Protected Module Win32DeclareLibraryWFS
 		    ret.Size = neededSize
 		    
 		    return ret
+		    
+		  #else
+		    
+		    #pragma unused data
+		    #pragma unused bufferSize
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -101,11 +114,18 @@ Protected Module Win32DeclareLibraryWFS
 		  end if
 		  
 		  #if TargetWin32
+		    
 		    Soft Declare Function CallNextHookEx Lib "User32" ( hookHandle as Integer, code as Integer, _
 		    wParam as Integer, lParam as Integer ) as Integer
 		    
 		    ' And make sure we call the next hook in the list
 		    return CallNextHookEx( mIdleHandlerHook, nCode, wParam, lParam )
+		    
+		  #else
+		    
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -142,12 +162,19 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function FillString(char as String, numChars as Integer) As String
 		  #if TargetWin32
+		    
 		    Declare Sub memset lib "msvcrt" ( dest as Ptr, char as Integer, count as Integer )
 		    
 		    dim mb as new MemoryBlock( LenB( char ) * numChars )
 		    memset( mb, AscB( char ), numChars )
 		    
 		    return DefineEncoding( mb, Encoding( char ) )
+		    
+		  #else
+		    
+		    #pragma unused char
+		    #pragma unused numChars
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -184,6 +211,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Sub GenerateKeyDown(virtualKeyCode as Integer, extendedKey as Boolean = false)
 		  #if TargetWin32
+		    
 		    Declare Sub keybd_event Lib "User32" ( keyCode as Integer, scanCode as Integer, _
 		    flags as Integer, extraData as Integer )
 		    
@@ -195,6 +223,12 @@ Protected Module Win32DeclareLibraryWFS
 		    
 		    ' Press the key
 		    keybd_event( virtualKeyCode, 0, flags, 0 )
+		    
+		  #else
+		    
+		    #pragma unused virtualKeyCode
+		    #pragma unused extendedKey
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -202,6 +236,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Sub GenerateKeyUp(virtualKeyCode as Integer, extendedKey as Boolean = false)
 		  #if TargetWin32
+		    
 		    Declare Sub keybd_event Lib "User32" ( keyCode as Integer, scanCode as Integer, _
 		    flags as Integer, extraData as Integer )
 		    
@@ -214,6 +249,12 @@ Protected Module Win32DeclareLibraryWFS
 		    Const KEYEVENTF_KEYUP = &h2
 		    flags = BitwiseOr( flags, KEYEVENTF_KEYUP )
 		    keybd_event( virtualKeyCode, 0, flags, 0 )
+		    
+		  #else
+		    
+		    #pragma unused virtualKeyCode
+		    #pragma unused extendedKey
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -235,6 +276,7 @@ Protected Module Win32DeclareLibraryWFS
 		  if mIdleHandlerHook <> 0 then return
 		  
 		  #if TargetWin32
+		    
 		    Declare Function SetWindowsHookExA Lib "User32" ( hookType as Integer, proc as Ptr, _
 		    instance as Integer, threadID as Integer ) as Integer
 		    Declare Function GetCurrentThreadId Lib "Kernel32" () as Integer
@@ -255,6 +297,11 @@ Protected Module Win32DeclareLibraryWFS
 		    
 		    ' And install the handler
 		    mIdleHandlerHook= SetWindowsHookExA( WH_FOREGROUNDIDLE, AddressOf DontCallThisIdleHandler, 0, GetCurrentThreadId )
+		    
+		  #else
+		    
+		    #pragma unused i
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -262,6 +309,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function IsAlphabetic(s as String) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function isalpha Lib "msvcrt" ( char as Integer ) as Integer
 		    
 		    dim mb as MemoryBlock
@@ -272,6 +320,11 @@ Protected Module Win32DeclareLibraryWFS
 		    catch
 		      return false
 		    end try
+		    
+		  #else
+		    
+		    #pragma unused s
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -279,6 +332,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function IsHexDigit(s as String) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function isxdigit Lib "msvcrt" ( char as Integer ) as Integer
 		    
 		    dim mb as MemoryBlock
@@ -289,6 +343,11 @@ Protected Module Win32DeclareLibraryWFS
 		    catch
 		      return false
 		    end try
+		    
+		  #else
+		    
+		    #pragma unused s
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -296,9 +355,15 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function IsInf(d as Double) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function _finite Lib "msvcrt" ( d as Double ) as Boolean
 		    
 		    return not _finite( d )
+		    
+		  #else
+		    
+		    #pragma unused d
+		    
 		  #endif
 		  
 		  return false
@@ -308,6 +373,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function IsLowerCase(s as String) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function islower Lib "msvcrt" ( char as Integer ) as Integer
 		    
 		    dim mb as MemoryBlock
@@ -318,6 +384,11 @@ Protected Module Win32DeclareLibraryWFS
 		    catch
 		      return false
 		    end try
+		    
+		  #else
+		    
+		    #pragma unused s
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -325,9 +396,15 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function IsNaN(d as Double) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function _isnan Lib "msvcrt" ( d as double ) as Boolean
 		    
 		    return _isnan( d )
+		    
+		  #else
+		    
+		    #pragma unused d
+		    
 		  #endif
 		  
 		  return false
@@ -337,6 +414,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function IsNumber(s as String) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function isdigit Lib "msvcrt" ( char as Integer ) as Integer
 		    
 		    dim mb as MemoryBlock
@@ -347,6 +425,11 @@ Protected Module Win32DeclareLibraryWFS
 		    catch
 		      return false
 		    end try
+		    
+		  #else
+		    
+		    #pragma unused s
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -354,6 +437,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function IsPunctuation(s as String) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function ispunct Lib "msvcrt" ( char as Integer ) as Integer
 		    
 		    dim mb as MemoryBlock
@@ -364,6 +448,11 @@ Protected Module Win32DeclareLibraryWFS
 		    catch
 		      return false
 		    end try
+		    
+		  #else
+		    
+		    #pragma unused s
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -371,6 +460,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function IsUpperCase(s as String) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function isupper Lib "msvcrt" ( char as Integer ) as Integer
 		    
 		    dim mb as MemoryBlock
@@ -381,6 +471,11 @@ Protected Module Win32DeclareLibraryWFS
 		    catch
 		      return false
 		    end try
+		    
+		  #else
+		    
+		    #pragma unused s
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -388,6 +483,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Function IsWhiteSpace(s as String) As Boolean
 		  #if TargetWin32
+		    
 		    Declare Function isspace Lib "msvcrt" ( char as Integer ) as Integer
 		    
 		    dim mb as MemoryBlock
@@ -398,6 +494,11 @@ Protected Module Win32DeclareLibraryWFS
 		    catch
 		      return false
 		    end try
+		    
+		  #else
+		    
+		    #pragma unused s
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -434,6 +535,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h1
 		Protected Sub PressKey(virtualKeyCode as Integer, extendedKey as Boolean = false)
 		  #if TargetWin32
+		    
 		    Declare Sub keybd_event Lib "User32" ( keyCode as Integer, scanCode as Integer, _
 		    flags as Integer, extraData as Integer )
 		    
@@ -449,6 +551,12 @@ Protected Module Win32DeclareLibraryWFS
 		    Const KEYEVENTF_KEYUP = &h2
 		    flags = BitwiseOr( flags, KEYEVENTF_KEYUP )
 		    keybd_event( virtualKeyCode, 0, flags, 0 )
+		    
+		  #else
+		    
+		    #pragma unused virtualKeyCode
+		    #pragma unused extendedKey
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -476,6 +584,7 @@ Protected Module Win32DeclareLibraryWFS
 	#tag Method, Flags = &h21
 		Private Function SRSetRestorePoint(change as Integer, reason as Integer, id as Int64 = 0, description as String = "") As Integer
 		  #if TargetWin32
+		    
 		    Soft Declare Function SRSetRestorePointW Lib "SrClient" ( spec as Ptr, status as Ptr ) as Boolean
 		    Soft Declare Function SRSetRestorePointA Lib "SrClient" ( spec as Ptr, status as Ptr ) as Boolean
 		    
@@ -513,6 +622,14 @@ Protected Module Win32DeclareLibraryWFS
 		      // Save the id off so we know what to close later
 		      return status.Int64Value( 4 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused change
+		    #pragma unused reason
+		    #pragma unused id
+		    #pragma unused description
+		    
 		  #endif
 		  
 		  return -1

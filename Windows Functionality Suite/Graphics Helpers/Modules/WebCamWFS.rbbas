@@ -3,6 +3,7 @@ Protected Module WebCamWFS
 	#tag Method, Flags = &h21
 		Private Function capCreateCaptureWindow(lpszWindowName as string, dwStyle as Integer, x as Integer, y as Integer, nWidth as Integer, nHeight as Integer, hWndParent as Integer, nID as Integer) As integer
 		  #if TargetWin32
+		    
 		    Soft Declare Function capCreateCaptureWindowA Lib "avicap32" ( lpszWindowName as CString, dwStyle as Integer, x as Integer, y as Integer, nWidth as Integer, nHeight as Integer, hWndParent as Integer, nID as Integer) as Integer
 		    Soft Declare Function capCreateCaptureWindowW Lib "avicap32" ( lpszWindowName as CString, dwStyle as Integer, x as Integer, y as Integer, nWidth as Integer, nHeight as Integer, hWndParent as Integer, nID as Integer) as Integer
 		    
@@ -14,13 +15,25 @@ Protected Module WebCamWFS
 		      return -1
 		    end if
 		    
-		  #Endif
+		  #else
+		    
+		    #pragma unused lpszWindowName
+		    #pragma unused dwStyle
+		    #pragma unused x
+		    #pragma unused y
+		    #pragma unused nWidth
+		    #pragma unused nHeight
+		    #pragma unused hWndParent
+		    #pragma unused nID
+		    
+		  #endif
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function capGetDriverDescription(wDriver as Integer, ByRef lpszName as string, ByRef lpszVer as string) As Boolean
 		  #if TargetWin32
+		    
 		    Soft Declare Function capGetDriverDescriptionW Lib "avicap32" (wDriver as Integer, lpszName as Ptr, cbName as Integer, lpszVer as Ptr, cbVer as Integer) as Boolean
 		    Soft Declare Function capGetDriverDescriptionA Lib "avicap32" (wDriver as Integer, lpszName as Ptr, cbName as Integer, lpszVer as Ptr, cbVer as Integer) as Boolean
 		    
@@ -41,6 +54,13 @@ Protected Module WebCamWFS
 		    end if
 		    
 		    return ret
+		    
+		  #else
+		    
+		    #pragma unused wDriver
+		    #pragma unused lpszName
+		    #pragma unused lpszVer
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -83,6 +103,7 @@ Protected Module WebCamWFS
 	#tag Method, Flags = &h21
 		Private Function SendMessage(wMsg as Integer, wParam as Integer, lparam as memoryblock) As integer
 		  #if TargetWin32
+		    
 		    Declare Function SendMessageA Lib "user32" ( hwnd as Integer, wMsg as Integer, wParam as Integer, lparam as ptr) as integer
 		    Declare Function SendMessageW Lib "user32" ( hwnd as Integer, wMsg as Integer, wParam as Integer, lparam as ptr) as integer
 		    
@@ -91,13 +112,21 @@ Protected Module WebCamWFS
 		    else
 		      return SendMessageA( mWnd, wMsg, wParam, lparam)
 		    end if
-		  #Endif
+		    
+		  #else
+		    
+		    #pragma unused wMsg
+		    #pragma unused wParam
+		    #pragma unused lparam
+		    
+		  #endif
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
 		Protected Function StartPreview(c as Canvas, deviceName as String) As Boolean
 		  #if TargetWin32 then
+		    
 		    Const WS_CHILD = &h40000000
 		    Const WS_BORDER = &h00800000
 		    Const WS_VISIBLE = &h10000000
@@ -138,6 +167,12 @@ Protected Module WebCamWFS
 		      DestroyWindow
 		      return false
 		    End If
+		    
+		  #else
+		    
+		    #pragma unused c
+		    #pragma unused deviceName
+		    
 		  #endif
 		End Function
 	#tag EndMethod

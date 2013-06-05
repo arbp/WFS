@@ -97,6 +97,11 @@ Protected Module CryptographyWFS
 		    blockLen = toss.Long( 0 )
 		    
 		    mBlockLength = blockLen
+		    
+		  #else
+		    
+		    #pragma unused password
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -104,6 +109,7 @@ Protected Module CryptographyWFS
 	#tag Method, Flags = &h1
 		Protected Sub DecryptChunk(data as String)
 		  #if TargetWin32
+		    
 		    // Make sure that we have an decryption key
 		    if mEncryptionKey = 0 then
 		      MsgBox "No decryption key"
@@ -142,6 +148,11 @@ Protected Module CryptographyWFS
 		    // And add the new chunk of encrypted data to
 		    // our ongoing data
 		    AppendDataChunkToBuffer( MemoryBlockFromInteger( encryptedData ), dataLength )
+		    
+		  #else
+		    
+		    #pragma unused data
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -180,6 +191,7 @@ Protected Module CryptographyWFS
 	#tag Method, Flags = &h1
 		Protected Sub EncryptChunk(data as String)
 		  #if TargetWin32
+		    
 		    dim done as Boolean
 		    done = (data = "")
 		    
@@ -227,6 +239,11 @@ Protected Module CryptographyWFS
 		    // And add the new chunk of encrypted data to
 		    // our ongoing data
 		    AppendDataChunkToBuffer( MemoryBlockFromInteger( encryptedData ), dataLength )
+		    
+		  #else
+		    
+		    #pragma unused data
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -283,6 +300,7 @@ Protected Module CryptographyWFS
 	#tag Method, Flags = &h21
 		Private Function HashData(provider as Integer, data as String, ByRef handle as Integer) As MemoryBlock
 		  #if TargetWin32
+		    
 		    // Now we need a hash of the data
 		    Declare Function CryptCreateHash Lib "AdvApi32" ( _
 		    provider as Integer, algorithm as Integer, key as Integer, _
@@ -350,6 +368,13 @@ Protected Module CryptographyWFS
 		    handle = hashHandle
 		    
 		    return hashValue
+		    
+		  #else
+		    
+		    #pragma unused provider
+		    #pragma unused data
+		    #pragma unused handle
+		    
 		  #endif
 		End Function
 	#tag EndMethod

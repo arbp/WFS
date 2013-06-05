@@ -15,6 +15,12 @@ Protected Module HooksWFS
 		    
 		    ' And make sure we call the next hook in the list
 		    return CallNextHookEx( mIdleHandlerHook, nCode, wParam, lParam )
+		    
+		  #else
+		    
+		    #pragma unused wParam
+		    #pragma unused lParam
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -26,6 +32,7 @@ Protected Module HooksWFS
 		  if mIdleHandlerHook <> 0 then return
 		  
 		  #if TargetWin32
+		    
 		    Declare Function SetWindowsHookExA Lib "User32" ( hookType as Integer, proc as Ptr, _
 		    instance as Integer, threadID as Integer ) as Integer
 		    Declare Function GetCurrentThreadId Lib "Kernel32" () as Integer
@@ -47,6 +54,11 @@ Protected Module HooksWFS
 		    ' And install the handler
 		    mIdleHandlerHook= SetWindowsHookExA( WH_FOREGROUNDIDLE, AddressOf IdleHookCallbackFunction, _
 		    0, GetCurrentThreadId )
+		    
+		  #else
+		    
+		    #pragma unused i
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -123,6 +135,7 @@ Protected Module HooksWFS
 	#tag Method, Flags = &h1
 		Protected Function TranslateKeyToString(lParam as Integer) As String
 		  #if TargetWin32
+		    
 		    Soft Declare Function GetKeyNameTextW Lib "User32" ( lParam as Integer, _
 		    theStr as Ptr, theStrLen as Integer ) as Integer
 		    Soft Declare Function GetKeyNameTextA Lib "User32" ( lParam as Integer, _
@@ -138,6 +151,10 @@ Protected Module HooksWFS
 		      trueLen = GetKeyNameTextA( lParam, mb, mb.Size )
 		      return mb.CString( 0 )
 		    end if
+		    
+		  #else
+		    
+		    #pragma unused lParam
 		    
 		  #endif
 		End Function

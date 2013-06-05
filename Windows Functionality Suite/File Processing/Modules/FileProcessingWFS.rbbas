@@ -396,6 +396,7 @@ Protected Module FileProcessingWFS
 	#tag Method, Flags = &h1
 		Protected Function GetVolumeSerialNumber(root as FolderItem) As Integer
 		  #if TargetWin32
+		    
 		    Soft Declare Function GetVolumeInformationA Lib "Kernel32" ( root as CString, _
 		    volName as Ptr, volNameSize as Integer, ByRef volSer as Integer, ByRef _
 		    maxCompLength as Integer, ByRef sysFlags as Integer, sysName as Ptr, _
@@ -418,6 +419,11 @@ Protected Module FileProcessingWFS
 		      sysFlags, sysName, 256 )
 		    end if
 		    return volSerial
+		    
+		  #else
+		    
+		    #pragma unused root
+		    
 		  #endif
 		End Function
 	#tag EndMethod
@@ -427,83 +433,105 @@ Protected Module FileProcessingWFS
 		  // We want to map the network drive the user gave us, which is in UNC format (like //10.10.10.116/foobar)
 		  // and map it to the local drive they gave us (like f:).
 		  
-		  Soft Declare Function WNetAddConnection2A Lib "Mpr" ( netRes as Ptr, password as CString, userName as CString, flags as Integer ) as Integer
-		  Soft Declare Function WNetAddConnection2W Lib "Mpr" ( netRes as Ptr, password as WString, userName as WString, flags as Integer ) as Integer
+		  #if TargetWin32
+		    
+		    Soft Declare Function WNetAddConnection2A Lib "Mpr" ( netRes as Ptr, password as CString, userName as CString, flags as Integer ) as Integer
+		    Soft Declare Function WNetAddConnection2W Lib "Mpr" ( netRes as Ptr, password as WString, userName as WString, flags as Integer ) as Integer
+		    
+		    dim unicodeSavvy as Boolean = System.IsFunctionAvailable( "WNetAddConnection2W", "Mpr" )
+		    
+		    Const CONNECT_INTERACTIVE = &h8
+		    Const RESOURCETYPE_DISK = &h1
+		    
+		    // Create and set up our network resource structure
+		    dim netRes as new MemoryBlock( 30 )
+		    netRes.Long( 4 ) = RESOURCETYPE_DISK
+		    
+		    dim localName as new MemoryBlock( 1024 )
+		    dim remoteName as new MemoryBlock( 1024 )
+		    if unicodeSavvy then
+		      localName.WString( 0 ) = localPath
+		      remoteName.WString( 0 ) = remotePath
+		    else
+		      locaLName.CString( 0 ) = localPath
+		      remoteName.CString( 0 ) = remotePath
+		    end if
+		    netRes.Ptr( 16 ) = localName
+		    netRes.Ptr( 20 ) = remoteName
+		    
+		    dim flags As Integer
+		    if interactive then flags = flags + CONNECT_INTERACTIVE
+		    
+		    // Now make the call
+		    dim ret as Integer
+		    
+		    if unicodeSavvy then
+		      ret = WNetAddConnection2W( netRes, password, userName, flags )
+		    else
+		      ret = WNetAddConnection2A( netRes, password, userName, flags )
+		    end if
+		    
+		    Const NO_ERROR = 0
+		    if ret = NO_ERROR then
+		      return new FolderItem( localPath )
+		    else
+		      return nil
+		    end if
+		    
+		  #else
+		    
+		    #pragma unused remotePath
+		    #pragma unused localPath
+		    #pragma unused userName
+		    #pragma unused password
+		    #pragma unused interactive
+		    
+		  #endif
 		  
-		  dim unicodeSavvy as Boolean = System.IsFunctionAvailable( "WNetAddConnection2W", "Mpr" )
-		  
-		  Const CONNECT_INTERACTIVE = &h8
-		  Const RESOURCETYPE_DISK = &h1
-		  
-		  // Create and set up our network resource structure
-		  dim netRes as new MemoryBlock( 30 )
-		  netRes.Long( 4 ) = RESOURCETYPE_DISK
-		  
-		  dim localName as new MemoryBlock( 1024 )
-		  dim remoteName as new MemoryBlock( 1024 )
-		  if unicodeSavvy then
-		    localName.WString( 0 ) = localPath
-		    remoteName.WString( 0 ) = remotePath
-		  else
-		    locaLName.CString( 0 ) = localPath
-		    remoteName.CString( 0 ) = remotePath
-		  end if
-		  netRes.Ptr( 16 ) = localName
-		  netRes.Ptr( 20 ) = remoteName
-		  
-		  dim flags As Integer
-		  if interactive then flags = flags + CONNECT_INTERACTIVE
-		  
-		  // Now make the call
-		  dim ret as Integer
-		  
-		  if unicodeSavvy then
-		    ret = WNetAddConnection2W( netRes, password, userName, flags )
-		  else
-		    ret = WNetAddConnection2A( netRes, password, userName, flags )
-		  end if
-		  
-		  Const NO_ERROR = 0
-		  if ret = NO_ERROR then
-		    return new FolderItem( localPath )
-		  else
-		    return nil
-		  end if
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
 		Protected Function MapNetworkDriveDialog(owner as Window) As FolderItem
-		  Soft Declare Function WNetConnectionDialog1W Lib "Mpr" ( dlgstruct as Ptr ) as Integer
-		  Soft Declare Function WNetConnectionDialog1A Lib "Mpr" ( dlgstruct as Ptr ) as Integer
+		  #if TargetWin32
+		    
+		    Soft Declare Function WNetConnectionDialog1W Lib "Mpr" ( dlgstruct as Ptr ) as Integer
+		    Soft Declare Function WNetConnectionDialog1A Lib "Mpr" ( dlgstruct as Ptr ) as Integer
+		    
+		    dim dlgstruct as new MemoryBlock( 20 )
+		    dim netRsrc as new MemoryBlock( 30 )
+		    
+		    Const RESOURCETYPE_DISK = &h1
+		    
+		    netRsrc.Long( 4 ) = RESOURCETYPE_DISK
+		    
+		    dlgStruct.Long( 0 ) = dlgstruct.Size
+		    'dlgStruct.Long( 4 ) = owner.WinHWND
+		    dlgStruct.Long( 4 ) = owner.Handle
+		    dlgstruct.Ptr( 8 ) = netRsrc
+		    
+		    // Now make the call
+		    dim ret as Integer
+		    if System.IsFunctionAvailable( "WNetConnectionDialog1W", "Mpr" ) then
+		      ret = WNetConnectionDialog1W( dlgstruct )
+		    else
+		      ret = WNetConnectionDialog1A( dlgstruct )
+		    end if
+		    
+		    if ret = 0 then
+		      // The drive letter is stored in the dlgstruct as an integer.  1 = a, 2 = b, etc
+		      dim drive as String = Chr( 65 + dlgstruct.Long( 16 ) - 1 ) + ":"
+		      return new FolderItem( drive )
+		    else
+		      return nil
+		    end if
+		    
+		  #else
+		    
+		    #pragma unused owner
+		    
+		  #endif
 		  
-		  dim dlgstruct as new MemoryBlock( 20 )
-		  dim netRsrc as new MemoryBlock( 30 )
-		  
-		  Const RESOURCETYPE_DISK = &h1
-		  
-		  netRsrc.Long( 4 ) = RESOURCETYPE_DISK
-		  
-		  dlgStruct.Long( 0 ) = dlgstruct.Size
-		  'dlgStruct.Long( 4 ) = owner.WinHWND
-		  dlgStruct.Long( 4 ) = owner.Handle
-		  dlgstruct.Ptr( 8 ) = netRsrc
-		  
-		  // Now make the call
-		  dim ret as Integer
-		  if System.IsFunctionAvailable( "WNetConnectionDialog1W", "Mpr" ) then
-		    ret = WNetConnectionDialog1W( dlgstruct )
-		  else
-		    ret = WNetConnectionDialog1A( dlgstruct )
-		  end if
-		  
-		  if ret = 0 then
-		    // The drive letter is stored in the dlgstruct as an integer.  1 = a, 2 = b, etc
-		    dim drive as String = Chr( 65 + dlgstruct.Long( 16 ) - 1 ) + ":"
-		    return new FolderItem( drive )
-		  else
-		    return nil
-		  end if
 		End Function
 	#tag EndMethod
 
@@ -607,52 +635,77 @@ Protected Module FileProcessingWFS
 		    
 		    return ret
 		    
+		  #else
+		    
+		    #pragma unused parentWindow
+		    #pragma unused filterTypes
+		    
 		  #endif
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
 		Protected Function UnmapNetworkDrive(drive as String, force as Boolean = false) As Boolean
-		  Soft Declare Function WNetCancelConnection2W Lib "Mpr" ( name as WString, flags as Integer, force as Boolean ) as Integer
-		  Soft Declare Function WNetCancelConnection2A Lib "Mpr" ( name as CString, flags as Integer, force as Boolean ) as Integer
+		  #if TargetWin32
+		    
+		    Soft Declare Function WNetCancelConnection2W Lib "Mpr" ( name as WString, flags as Integer, force as Boolean ) as Integer
+		    Soft Declare Function WNetCancelConnection2A Lib "Mpr" ( name as CString, flags as Integer, force as Boolean ) as Integer
+		    
+		    if System.IsFunctionAvailable( "WNetCancelConnection2W", "Mpr" ) then
+		      return WNetCancelConnection2W( drive, 0, force ) = 0
+		    else
+		      return WNetCancelConnection2A( drive, 0, force ) = 0
+		    end if
+		    
+		  #else
+		    
+		    #pragma unused drive
+		    #pragma unused force
+		    
+		  #endif
 		  
-		  if System.IsFunctionAvailable( "WNetCancelConnection2W", "Mpr" ) then
-		    return WNetCancelConnection2W( drive, 0, force ) = 0
-		  else
-		    return WNetCancelConnection2A( drive, 0, force ) = 0
-		  end if
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
 		Protected Function UnmapNetworkDriveDialog(owner as Window, localPath as String) As Boolean
-		  Soft Declare Function WNetDisconnectDialog1W Lib "Mpr" ( dlgstruct as Ptr ) as Integer
-		  Soft Declare Function WNetDisconnectDialog1A Lib "Mpr" ( dlgstruct as Ptr ) as Integer
+		  #if TargetWin32
+		    
+		    Soft Declare Function WNetDisconnectDialog1W Lib "Mpr" ( dlgstruct as Ptr ) as Integer
+		    Soft Declare Function WNetDisconnectDialog1A Lib "Mpr" ( dlgstruct as Ptr ) as Integer
+		    
+		    dim dlgstruct as new MemoryBlock( 20 )
+		    dlgstruct.Long( 0 ) = dlgstruct.Size
+		    'dlgstruct.Long( 4 ) = owner.WinHWND
+		    dlgstruct.Long( 4 ) = owner.Handle
+		    
+		    if Right( localPath, 1 ) = "\" then localPath = Left( localPath, 2 )
+		    
+		    dim localName as new MemoryBlock( 1024 )
+		    if System.IsFunctionAvailable( "WNetDisconnectDialog1W", "Mpr" ) then
+		      localName.WString( 0 ) = localPath
+		    else
+		      localName.CString( 0 ) = localPath
+		    end if
+		    
+		    dlgstruct.Ptr( 8 ) = localName
+		    
+		    dim ret as Integer
+		    if System.IsFunctionAvailable( "WNetDisconnectDialog1W", "Mpr" ) then
+		      ret = WNetDisconnectDialog1W( dlgstruct )
+		    else
+		      ret = WNetDisconnectDialog1A( dlgstruct )
+		    end if
+		    
+		    return ret = 0
+		    
+		  #else
+		    
+		    #pragma unused owner
+		    #pragma unused localPath
+		    
+		  #endif
 		  
-		  dim dlgstruct as new MemoryBlock( 20 )
-		  dlgstruct.Long( 0 ) = dlgstruct.Size
-		  'dlgstruct.Long( 4 ) = owner.WinHWND
-		  dlgstruct.Long( 4 ) = owner.Handle
-		  
-		  if Right( localPath, 1 ) = "\" then localPath = Left( localPath, 2 )
-		  
-		  dim localName as new MemoryBlock( 1024 )
-		  if System.IsFunctionAvailable( "WNetDisconnectDialog1W", "Mpr" ) then
-		    localName.WString( 0 ) = localPath
-		  else
-		    localName.CString( 0 ) = localPath
-		  end if
-		  
-		  dlgstruct.Ptr( 8 ) = localName
-		  
-		  dim ret as Integer
-		  if System.IsFunctionAvailable( "WNetDisconnectDialog1W", "Mpr" ) then
-		    ret = WNetDisconnectDialog1W( dlgstruct )
-		  else
-		    ret = WNetDisconnectDialog1A( dlgstruct )
-		  end if
-		  
-		  return ret = 0
 		End Function
 	#tag EndMethod
 
