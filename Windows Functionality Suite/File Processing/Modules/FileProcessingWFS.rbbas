@@ -130,10 +130,10 @@ Protected Module FileProcessingWFS
 		    dim high as double = free.Long( 4 )
 		    dim low as double = free.Long( 0 )
 		    
-		    if high < 0 then high = high + pow( 2, 32 )
-		    if low < 0 then low= low + pow( 2, 32 )
+		    if high < 0 then high = high + REALbasic.Pow( 2, 32 )
+		    if low < 0 then low= low + REALbasic.Pow( 2, 32 )
 		    
-		    ret = high * Pow( 2, 32 )
+		    ret = high * REALbasic.Pow( 2, 32 )
 		    ret = ret + low
 		    
 		    return ret
@@ -210,10 +210,10 @@ Protected Module FileProcessingWFS
 		    dim high as double = total.Long( 4 )
 		    dim low as double = total.Long( 0 )
 		    
-		    if high < 0 then high = high + pow( 2, 32 )
-		    if low < 0 then low= low + pow( 2, 32 )
+		    if high < 0 then high = high + REALbasic.Pow( 2, 32 )
+		    if low < 0 then low= low + REALbasic.Pow( 2, 32 )
 		    
-		    ret = high * Pow( 2, 32 )
+		    ret = high * REALbasic.Pow( 2, 32 )
 		    ret = ret + low
 		    
 		    return ret
@@ -252,10 +252,10 @@ Protected Module FileProcessingWFS
 		    dim high as double = totalFree.Long( 4 )
 		    dim low as double = totalFree.Long( 0 )
 		    
-		    if high < 0 then high = high + pow( 2, 32 )
-		    if low < 0 then low= low + pow( 2, 32 )
+		    if high < 0 then high = high + REALbasic.Pow( 2, 32 )
+		    if low < 0 then low= low + REALbasic.Pow( 2, 32 )
 		    
-		    ret = high * Pow( 2, 32 )
+		    ret = high * REALbasic.Pow( 2, 32 )
 		    ret = ret + low
 		    
 		    return ret

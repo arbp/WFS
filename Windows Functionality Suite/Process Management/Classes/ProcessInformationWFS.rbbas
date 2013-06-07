@@ -3,6 +3,7 @@ Protected Class ProcessInformationWFS
 	#tag Method, Flags = &h0
 		Sub BringToFront()
 		  #if TargetWin32
+		    
 		    // First, make sure we've loaded our thread information
 		    if UBound( LoadedThreads ) = -1 then LoadThreads
 		    
@@ -12,8 +13,9 @@ Protected Class ProcessInformationWFS
 		    for i = 0 to UBound( LoadedThreads )
 		      Declare Sub EnumThreadWindows Lib "User32" ( threadID as Integer, proc as Ptr, cookie as Integer )
 		      
-		      EnumThreadWindows( LoadedThreads( i ).ThreadID, AddressOf BringToFrontCallback, 0 )
+		      EnumThreadWindows( LoadedThreads( i ).ThreadID, AddressOf ProcessManagementWFS.BringToFrontCallback, 0 )
 		    next i
+		    
 		  #endif
 		End Sub
 	#tag EndMethod
@@ -82,7 +84,7 @@ Protected Class ProcessInformationWFS
 		    
 		    dim mb as new MemoryBlock( 16 )
 		    
-		    dim entry as HeapListInformation
+		    dim entry as HeapListInformationWFS
 		    
 		    mb.Long( 0 ) = mb.Size
 		    if not Heap32ListFirst( snapHandle, mb ) then return
@@ -90,7 +92,7 @@ Protected Class ProcessInformationWFS
 		    dim good as Boolean
 		    
 		    do
-		      entry = new HeapListInformation( mb )
+		      entry = new HeapListInformationWFS( mb )
 		      
 		      LoadedHeapLists.Append( entry )
 		      
@@ -125,7 +127,7 @@ Protected Class ProcessInformationWFS
 		      mb = new MemoryBlock( 32 + 256 + 260 )
 		    end if
 		    
-		    dim entry as ModuleInformation
+		    dim entry as ModuleInformationWFS
 		    
 		    mb.Long( 0 ) = mb.Size
 		    if unicodeSavvy then
@@ -137,7 +139,7 @@ Protected Class ProcessInformationWFS
 		    dim good as Boolean
 		    
 		    do
-		      entry = new ModuleInformation( mb, unicodeSavvy )
+		      entry = new ModuleInformationWFS( mb, unicodeSavvy )
 		      
 		      LoadedModules.Append( entry )
 		      
@@ -170,7 +172,7 @@ Protected Class ProcessInformationWFS
 		    
 		    dim mb as new MemoryBlock( 28 )
 		    
-		    dim entry as ThreadInformation
+		    dim entry as ThreadInformationWFS
 		    
 		    mb.Long( 0 ) = mb.Size
 		    if not Thread32First( snapHandle, mb ) then return
@@ -178,7 +180,7 @@ Protected Class ProcessInformationWFS
 		    dim good as Boolean
 		    
 		    do
-		      entry = new ThreadInformation( mb )
+		      entry = new ThreadInformationWFS( mb )
 		      
 		      // For whatever reason, the system will tell us about every thread running
 		      // in the entire OS even though we specify the process ID.  This is documented

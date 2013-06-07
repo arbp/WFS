@@ -257,7 +257,7 @@ Protected Module RegistryWFS
 		      oldMask = policies.Value( "NoDrives" )
 		    end
 		    
-		    return BitwiseAnd( oldMask, Pow( 2, driveNum ) ) = 0
+		    return BitwiseAnd( oldMask, REALbasic.Pow( 2, driveNum ) ) = 0
 		    
 		  #else
 		    
@@ -289,9 +289,9 @@ Protected Module RegistryWFS
 		    end
 		    
 		    if not set then
-		      oldMask = BitwiseOr( oldMask, Pow( 2, driveNum ) )
+		      oldMask = BitwiseOr( oldMask, REALbasic.Pow( 2, driveNum ) )
 		    else
-		      oldMask = BitwiseAnd( oldMask, Bitwise.OnesComplement( Pow( 2, driveNum ) ) )
+		      oldMask = BitwiseAnd( oldMask, Bitwise.OnesComplement( REALbasic.Pow( 2, driveNum ) ) )
 		    end
 		    
 		    policies.Value( "NoDrives" ) = oldMask
@@ -1314,13 +1314,13 @@ Protected Module RegistryWFS
 	#tag EndMethod
 
 
-	#tag Constant, Name = kCentered, Type = Double, Dynamic = False, Default = \"2", Scope = Public
+	#tag Constant, Name = kCentered, Type = Double, Dynamic = False, Default = \"2", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = kStretched, Type = Double, Dynamic = False, Default = \"1", Scope = Public
+	#tag Constant, Name = kStretched, Type = Double, Dynamic = False, Default = \"1", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = kTiled, Type = Double, Dynamic = False, Default = \"0", Scope = Public
+	#tag Constant, Name = kTiled, Type = Double, Dynamic = False, Default = \"0", Scope = Protected
 	#tag EndConstant
 
 

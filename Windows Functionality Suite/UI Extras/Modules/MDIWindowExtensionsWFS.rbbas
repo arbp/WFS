@@ -1,12 +1,12 @@
 #tag Module
 Protected Module MDIWindowExtensionsWFS
 	#tag Method, Flags = &h0
-		Sub CascadeChildren(extends w as MDIWindow)
+		Sub CascadeChildrenWFS(extends w as MDIWindow)
 		  #if TargetWin32
 		    
 		    Declare Sub CascadeWindows Lib "User32" ( parent as Integer, how as Integer, r as Integer, num as Integer, kids as Integer )
 		    
-		    dim clientHandle as Integer = w.MDIClientHandle
+		    dim clientHandle as Integer = w.MDIClientHandleWFS
 		    dim how as Integer
 		    
 		    if clientHandle <> 0 then
@@ -67,35 +67,6 @@ Protected Module MDIWindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function CloseButtonState(extends w as MDIWindow) As Boolean
-		  #if TargetWin32
-		    
-		    Declare Function GetSystemMenu Lib "User32" ( wnd as Integer, revert as Boolean ) as Integer
-		    Declare Function GetMenuState Lib "User32" ( menu as Integer, which as Integer, flags as Integer ) as Integer
-		    
-		    dim menu as Integer = GetSystemMenu( w.Handle, false )
-		    if menu = 0 then return false
-		    
-		    Const SC_CLOSE = &hF060
-		    Const MF_BYCOMMAND = 0
-		    Const MF_GRAYED = 1
-		    Const MF_ENABLED = 0
-		    Const MF_DISABLED = 2
-		    
-		    dim state as Integer
-		    state = GetMenuState( menu, SC_CLOSE, MF_BYCOMMAND )
-		    
-		    return Bitwise.BitAnd( state, MF_DISABLED + MF_GRAYED ) = 0
-		    
-		  #else
-		    
-		    #pragma unused w
-		    
-		  #endif
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
 		Sub CloseButtonState(extends w as MDIWindow, assigns enabled as Boolean)
 		  #if TargetWin32
 		    
@@ -123,6 +94,35 @@ Protected Module MDIWindowExtensionsWFS
 		    
 		  #endif
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function CloseButtonStateWFS(extends w as MDIWindow) As Boolean
+		  #if TargetWin32
+		    
+		    Declare Function GetSystemMenu Lib "User32" ( wnd as Integer, revert as Boolean ) as Integer
+		    Declare Function GetMenuState Lib "User32" ( menu as Integer, which as Integer, flags as Integer ) as Integer
+		    
+		    dim menu as Integer = GetSystemMenu( w.Handle, false )
+		    if menu = 0 then return false
+		    
+		    Const SC_CLOSE = &hF060
+		    Const MF_BYCOMMAND = 0
+		    Const MF_GRAYED = 1
+		    Const MF_ENABLED = 0
+		    Const MF_DISABLED = 2
+		    
+		    dim state as Integer
+		    state = GetMenuState( menu, SC_CLOSE, MF_BYCOMMAND )
+		    
+		    return Bitwise.BitAnd( state, MF_DISABLED + MF_GRAYED ) = 0
+		    
+		  #else
+		    
+		    #pragma unused w
+		    
+		  #endif
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -163,14 +163,6 @@ Protected Module MDIWindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function HasMaximizeButton(extends w as MDIWindow) As Boolean
-		  Const WS_MAXIMIZEBOX = &h00010000
-		  
-		  return TestWindowStyle( w, WS_MAXIMIZEBOX )
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
 		Sub HasMaximizeButton(extends w as MDIWindow, assigns set as Boolean)
 		  Const WS_MAXIMIZEBOX = &h00010000
 		  
@@ -179,10 +171,10 @@ Protected Module MDIWindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function HasMinimizeButton(extends w as MDIWindow) As Boolean
-		  Const WS_MINIMIZEBOX = &h00020000
+		Function HasMaximizeButtonWFS(extends w as MDIWindow) As Boolean
+		  Const WS_MAXIMIZEBOX = &h00010000
 		  
-		  return TestWindowStyle( w, WS_MINIMIZEBOX )
+		  return TestWindowStyle( w, WS_MAXIMIZEBOX )
 		End Function
 	#tag EndMethod
 
@@ -195,10 +187,10 @@ Protected Module MDIWindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function HasSystemMenu(extends w as MDIWindow) As Boolean
-		  Const WS_SYSMENU = &h00080000
+		Function HasMinimizeButtonWFS(extends w as MDIWindow) As Boolean
+		  Const WS_MINIMIZEBOX = &h00020000
 		  
-		  return TestWindowStyle( w, WS_SYSMENU )
+		  return TestWindowStyle( w, WS_MINIMIZEBOX )
 		End Function
 	#tag EndMethod
 
@@ -211,7 +203,15 @@ Protected Module MDIWindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function IsMaximized(extends w as MDIWindow) As Boolean
+		Function HasSystemMenuWFS(extends w as MDIWindow) As Boolean
+		  Const WS_SYSMENU = &h00080000
+		  
+		  return TestWindowStyle( w, WS_SYSMENU )
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function IsMaximizedWFS(extends w as MDIWindow) As Boolean
 		  #if TargetWin32
 		    
 		    Declare Function IsZoomed Lib "User32" ( hwnd As Integer ) As Integer
@@ -227,7 +227,7 @@ Protected Module MDIWindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function IsMinimized(extends w as MDIWindow) As Boolean
+		Function IsMinimizedWFS(extends w as MDIWindow) As Boolean
 		  #if TargetWin32
 		    
 		    Declare Function IsIconic Lib "User32" ( hwnd As Integer ) As Integer
@@ -243,7 +243,7 @@ Protected Module MDIWindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function MDIClientHandle(extends w as MDIWindow) As Integer
+		Function MDIClientHandleWFS(extends w as MDIWindow) As Integer
 		  // There's two different handles used for an MDI window.  The frame
 		  // handle (which is MDIWindow.Handle), and the client handle.  This
 		  // gets the client handle, which is used for things like tiling or cascading
@@ -300,12 +300,12 @@ Protected Module MDIWindowExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub TileChildren(extends w as MDIWindow, horizontal as Boolean = true)
+		Sub TileChildrenWFS(extends w as MDIWindow, horizontal as Boolean = true)
 		  #if TargetWin32
 		    
 		    Declare Sub TileWindows Lib "User32" ( parent as Integer, how as Integer, r as Integer, num as Integer, kids as Integer )
 		    
-		    dim clientHandle as Integer = w.MDIClientHandle
+		    dim clientHandle as Integer = w.MDIClientHandleWFS
 		    dim how as Integer
 		    
 		    Const MDITILE_HORIZONTAL = &h1

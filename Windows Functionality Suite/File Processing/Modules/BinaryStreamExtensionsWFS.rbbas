@@ -1,7 +1,7 @@
 #tag Module
 Protected Module BinaryStreamExtensionsWFS
 	#tag Method, Flags = &h0
-		Function ReadCString(extends bs as BinaryStream, enc as TextEncoding = nil) As String
+		Function ReadCStringWFS(extends bs as BinaryStream, enc as TextEncoding = nil) As String
 		  // Read one bytes at a time until we come to a 0-byte.
 		  dim ret as String
 		  dim bytes as UInt8
@@ -17,11 +17,12 @@ Protected Module BinaryStreamExtensionsWFS
 		  loop until bytes = 0
 		  
 		  return ret
+		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function ReadWString(extends bs as BinaryStream) As String
+		Function ReadWStringWFS(extends bs as BinaryStream) As String
 		  // Read one word at a time until we come to a 0-word.
 		  dim ret as String
 		  dim word as UInt16

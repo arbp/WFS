@@ -631,8 +631,8 @@ Protected Module PlugAndPlayWFS
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
-		Function PlugAndPlayWndProc(hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer) As Integer
+	#tag Method, Flags = &h1
+		Protected Function PlugAndPlayWndProc(hwnd as Integer, msg as Integer, wParam as Integer, lParam as Integer) As Integer
 		  #if TargetWin32
 		    
 		    Const WM_DEVICECHANGE = &h0219
