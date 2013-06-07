@@ -180,29 +180,40 @@ Protected Module VBWFS
 
 	#tag Method, Flags = &h1
 		Protected Sub DeleteSetting(appName as String, section as String, key as String = "")
-		  // First, we want to get a registry key that points
-		  // to the default location of all VB settings.
-		  dim base as new RegistryItem( kSettingsLocation )
-		  
-		  // Now we want to delve into the appName folder
-		  base = base.Child( appName )
-		  
-		  // If we don't have a key name, then we want to
-		  // delete the entire section.  Otherwise, we want
-		  // to delve into the section and delete the
-		  // key specified.
-		  if key = "" then
-		    base.Delete( section )
-		  else
-		    // Dive into the section
-		    base = base.Child( section )
-		    // And delete the key
-		    base.Delete( key )
-		  end if
-		  
+		  #if TargetWin32
+		    
+		    // First, we want to get a registry key that points
+		    // to the default location of all VB settings.
+		    dim base as new RegistryItem( kSettingsLocation )
+		    
+		    // Now we want to delve into the appName folder
+		    base = base.Child( appName )
+		    
+		    // If we don't have a key name, then we want to
+		    // delete the entire section.  Otherwise, we want
+		    // to delve into the section and delete the
+		    // key specified.
+		    if key = "" then
+		      base.Delete( section )
+		    else
+		      // Dive into the section
+		      base = base.Child( section )
+		      // And delete the key
+		      base.Delete( key )
+		    end if
+		    
 		Exception err as RegistryAccessErrorException
 		  // Something bad happened, so let's just bail out
 		  return
+		  
+		  #else
+		    
+		    #pragma unused appName
+		    #pragma unused section
+		    #pragma unused key
+		    
+		  #endif
+		  
 		End Sub
 	#tag EndMethod
 
@@ -506,7 +517,7 @@ Protected Module VBWFS
 	#tag Method, Flags = &h1
 		Protected Function IPmt(rate as Double, per as Integer, nper as Integer, pv as Double, fv as Double = 0, type as Integer = 0) As Double
 		  // IPmt is the principle for the previous month times the interest rate
-		  // http://www.gnome.org/projects/gnumeric/doc/gnumeric-IPMT.shtml
+		  // http://projects.gnome.org/gnumeric/doc/gnumeric-function-IPMT.shtml
 		  
 		  // IMPLEMENT THIS -KT
 		  
