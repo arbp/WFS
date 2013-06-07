@@ -77,8 +77,8 @@ Protected Module GraphicsHelpersWFS
 		    screenHDC = GetDC( 0 )
 		    
 		    Dim hBitmap, width, height as Integer
-		    width = SystemMetrics.VirtualScreenWidth
-		    height = SystemMetrics.VirtualScreenHeight
+		    width = SystemMetricsWFS.VirtualScreenWidth
+		    height = SystemMetricsWFS.VirtualScreenHeight
 		    hBitmap = CreateCompatibleBitmap( screenHDC, width, height )
 		    
 		    if hBitmap = 0 then return nil
@@ -179,7 +179,7 @@ Protected Module GraphicsHelpersWFS
 		    end
 		    
 		    dim unicodeSavvy as Boolean = System.IsFunctionAvailable( "ChooseFontW", "ComDlg32" )
-		    dim temp as new LogicalFont
+		    dim temp as new LogicalFontWFS
 		    dim theLogFont as MemoryBlock = temp.ToMemoryBlock( unicodeSavvy )
 		    mb.Ptr( 12 ) = theLogFont
 		    
@@ -234,7 +234,7 @@ Protected Module GraphicsHelpersWFS
 		    // same whether it's the W version or the A version.  We
 		    // just need to treat the pointers differently
 		    dim mb as new MemoryBlock( 15 * 4 )
-		    dim ret as new LogicalFont
+		    dim ret as new LogicalFontWFS
 		    
 		    mb.Long( 0 ) = mb.Size
 		    
@@ -259,7 +259,7 @@ Protected Module GraphicsHelpersWFS
 		    end if
 		    
 		    if success then
-		      ret = new LogicalFont( theLogFont, unicodeSavvy )
+		      ret = new LogicalFontWFS( theLogFont, unicodeSavvy )
 		      
 		      ' Be sure to release the device context
 		      ReleaseDC( mb.Long( 8 ) )

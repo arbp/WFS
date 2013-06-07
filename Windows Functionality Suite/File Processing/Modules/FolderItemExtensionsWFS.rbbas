@@ -1,7 +1,7 @@
 #tag Module
 Protected Module FolderItemExtensionsWFS
 	#tag Method, Flags = &h0
-		Sub AddToRecentItems(extends f as FolderItem)
+		Sub AddToRecentItemsWFS(extends f as FolderItem)
 		  // We want to add this folder item to the recent docs menu
 		  #if TargetWin32
 		    
@@ -35,7 +35,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub AssociateExtension(extends f as FolderItem, set as Boolean)
+		Sub AssociateExtensionWFS(extends f as FolderItem, set as Boolean)
 		  ' We wanna make two different registry items in CLASSES_ROOT
 		  ' to deal with this.
 		  
@@ -110,7 +110,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub CopyFileToWithProgress(extends fromFile as FolderItem, toFile as FolderItem)
+		Sub CopyFileToWithProgressWFS(extends fromFile as FolderItem, toFile as FolderItem)
 		  // Delegate to the heavy-lifting function
 		  CopyMoveOp( fromFile, toFile, false )
 		End Sub
@@ -194,7 +194,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub DecryptNTFSFile(extends item as FolderItem)
+		Sub DecryptNTFSFileWFS(extends item as FolderItem)
 		  if item = nil then return
 		  
 		  #if TargetWin32
@@ -213,7 +213,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub DeleteOnReboot(extends f as FolderItem)
+		Sub DeleteOnRebootWFS(extends f as FolderItem)
 		  if f is nil then return
 		  
 		  #if TargetWin32 then
@@ -261,7 +261,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub EmptyTrash(extends f as folderItem)
+		Sub EmptyTrashWFS(extends f as folderItem)
 		  '// This method will empty the RecycleBins on the given drive
 		  '// By Anthony G. Cyphers
 		  '// 05/17/2007
@@ -296,7 +296,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub EncryptNTFSFile(extends item as FolderItem)
+		Sub EncryptNTFSFileWFS(extends item as FolderItem)
 		  if item = nil then return
 		  
 		  #if TargetWin32
@@ -313,7 +313,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function GetShortPath(extends f as FolderItem) As string
+		Function GetShortPathWFS(extends f as FolderItem) As string
 		  #if TargetWin32
 		    
 		    /// This takes a long path and returns the truncated path
@@ -344,7 +344,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function GetTrashCount(extends f as folderItem) As Int64
+		Function GetTrashCountWFS(extends f as folderItem) As Int64
 		  '// This function return the number of items for the given drive's RecycleBin
 		  '// By Anthony G. Cyphers
 		  '// 05/17/2007
@@ -382,7 +382,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function GetTrashSize(extends f as FolderItem) As Int64
+		Function GetTrashSizeWFS(extends f as FolderItem) As Int64
 		  '// This function will return the size of the given RecycleBin in bytes.
 		  '// By Anthony G. Cyphers
 		  '// 05/17/2007
@@ -418,7 +418,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function GetVersionInformation(extends f as FolderItem) As VersionInformationWFS
+		Function GetVersionInformationWFS(extends f as FolderItem) As VersionInformationWFS
 		  #if TargetWin32
 		    
 		    Soft Declare Function GetFileVersionInfoA lib "Version" ( fileName as CString, ignored as Integer, len as Integer, buffer as Ptr) as Boolean
@@ -653,7 +653,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function HasChanged(extends f as FolderItem) As Boolean
+		Function HasChangedWFS(extends f as FolderItem) As Boolean
 		  #if TargetWin32
 		    
 		    // Check to see if this folder item has a handle in the map
@@ -695,7 +695,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function IsExtensionAssociated(extends f as FolderItem) As Boolean
+		Function IsExtensionAssociatedWFS(extends f as FolderItem) As Boolean
 		  ' We wanna make two different registry items in CLASSES_ROOT
 		  ' to deal with this.
 		  
@@ -724,7 +724,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function IsStartupItem(extends f as FolderItem, machineWide as Boolean) As Boolean
+		Function IsStartupItemWFS(extends f as FolderItem, machineWide as Boolean) As Boolean
 		  #if TargetWin32
 		    
 		    dim runItem as RegistryItem
@@ -751,33 +751,6 @@ Protected Module FolderItemExtensionsWFS
 		exception
 		  return false
 		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub Launch(extends f as FolderItem, ParamArray args as String)
-		  #if TargetWin32
-		    
-		    Soft Declare Sub ShellExecuteA Lib "Shell32" ( hwnd as Integer, operation as CString, _
-		    file as CString, params as CString, directory as CString, show as Integer )
-		    Soft Declare Sub ShellExecuteW Lib "Shell32" ( hwnd as Integer, operation as WString, _
-		    file as WString, params as WString, directory as WString, show as Integer )
-		    
-		    dim params as String
-		    params = Join( args, " " )
-		    
-		    if System.IsFunctionAvailable( "ShellExecuteW", "Shell32" ) then
-		      ShellExecuteW( 0, "open", f.AbsolutePath, params, "", 1 )
-		    else
-		      ShellExecuteA( 0, "open", f.AbsolutePath, params, "", 1 )
-		    end if
-		    
-		  #else
-		    
-		    #pragma unused f
-		    #pragma unused args
-		    
-		  #endif
-		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
@@ -877,7 +850,34 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub MoveFileToWithProgress(extends fromFile as FolderItem, toFile as FolderItem)
+		Sub LaunchWFS(extends f as FolderItem, ParamArray args as String)
+		  #if TargetWin32
+		    
+		    Soft Declare Sub ShellExecuteA Lib "Shell32" ( hwnd as Integer, operation as CString, _
+		    file as CString, params as CString, directory as CString, show as Integer )
+		    Soft Declare Sub ShellExecuteW Lib "Shell32" ( hwnd as Integer, operation as WString, _
+		    file as WString, params as WString, directory as WString, show as Integer )
+		    
+		    dim params as String
+		    params = Join( args, " " )
+		    
+		    if System.IsFunctionAvailable( "ShellExecuteW", "Shell32" ) then
+		      ShellExecuteW( 0, "open", f.AbsolutePath, params, "", 1 )
+		    else
+		      ShellExecuteA( 0, "open", f.AbsolutePath, params, "", 1 )
+		    end if
+		    
+		  #else
+		    
+		    #pragma unused f
+		    #pragma unused args
+		    
+		  #endif
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub MoveFileToWithProgressWFS(extends fromFile as FolderItem, toFile as FolderItem)
 		  // Delegate to the heavy-lifting function
 		  CopyMoveOp( fromFile, toFile, true )
 		End Sub
@@ -895,7 +895,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Reveal(extends f as FolderItem)
+		Sub RevealWFS(extends f as FolderItem)
 		  #if TargetWin32
 		    
 		    dim param as String = "/select, """ + f.AbsolutePath + """"
@@ -922,7 +922,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub StartupItem(extends f as FolderItem, machineWide as Boolean, assigns set as Boolean)
+		Sub StartupItemWFS(extends f as FolderItem, machineWide as Boolean, assigns set as Boolean)
 		  #if TargetWin32
 		    
 		    dim runItem as RegistryItem
@@ -957,7 +957,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub StartWatchingForChanges(extends f as FolderItem, watchSubDirs as Boolean)
+		Sub StartWatchingForChangesWFS(extends f as FolderItem, watchSubDirs as Boolean)
 		  #if TargetWin32
 		    
 		    Soft Declare Function FindFirstChangeNotificationA Lib "Kernel32" ( path as CString, watchSubDirs as Boolean, flags as Integer ) as Integer
@@ -992,7 +992,7 @@ Protected Module FolderItemExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub StopWatchingForChanges(extends f as FolderItem)
+		Sub StopWatchingForChangesWFS(extends f as FolderItem)
 		  #if TargetWin32
 		    
 		    // Check to see if this folder item has a handle in the map

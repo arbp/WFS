@@ -26,10 +26,10 @@ Implements WndProcSubclassWFS
 
 	#tag Method, Flags = &h0
 		Sub Constructor(w as MDIWindow)
-		  ConstructorHelper( w.MDIClientHandle, true )
+		  ConstructorHelper( w.MDIClientHandleWFS, true )
 		  
 		  // Now we need to subclass the window
-		  WndProcHelpersWFS.Subclass( w.MDIClientHandle, me )
+		  WndProcHelpersWFS.Subclass( w.MDIClientHandleWFS, me )
 		  
 		End Sub
 	#tag EndMethod
@@ -644,7 +644,7 @@ Implements WndProcSubclassWFS
 		  return false
 		  
 		  #pragma unused hWnd
-		  #pragma unused returnValue // Was this an oversight? -KT 
+		  #pragma unused returnValue // Was this an oversight? -KT
 		End Function
 	#tag EndMethod
 

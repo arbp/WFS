@@ -315,7 +315,7 @@ Implements WndProcSubclassWFS
 		    
 		    // Subclass the RB Window so that we can get messages
 		    // for this window.  Be sure to keep the RB Window around tho
-		    WndProcHelpers.Subclass( w, self )
+		    WndProcHelpersWFS.Subclass( w, self )
 		    mRBWindow = w
 		    
 		  #else

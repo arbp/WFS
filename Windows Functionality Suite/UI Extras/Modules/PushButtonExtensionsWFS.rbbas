@@ -1,7 +1,7 @@
 #tag Module
 Protected Module PushButtonExtensionsWFS
 	#tag Method, Flags = &h0
-		Function BottomJustified(extends p as PushButton) As Boolean
+		Function BottomJustifiedWFS(extends p as PushButton) As Boolean
 		  Const BS_BOTTOM = &h800
 		  
 		  return TestWindowStyle( p.Handle, BS_BOTTOM )
@@ -9,7 +9,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub BottomJustified(extends p as PushButton, assigns set as Boolean)
+		Sub BottomJustifiedWFS(extends p as PushButton, assigns set as Boolean)
 		  Const BS_BOTTOM = &h800
 		  
 		  ChangeWindowStyle( p.Handle, BS_BOTTOM, set )
@@ -17,14 +17,14 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function CenterJustified(extends p as PushButton) As Boolean
+		Function CenterJustifiedWFS(extends p as PushButton) As Boolean
 		  Const BS_CENTER = &h300
 		  return TestWindowStyle( p.Handle, BS_CENTER )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub CenterJustified(extends p as PushButton, assigns set as Boolean)
+		Sub CenterJustifiedWFS(extends p as PushButton, assigns set as Boolean)
 		  Const BS_CENTER = &h300
 		  ChangeWindowStyle( p.Handle, BS_CENTER, set )
 		End Sub
@@ -76,7 +76,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function Flat(extends p as PushButton) As Boolean
+		Function FlatWFS(extends p as PushButton) As Boolean
 		  Const BS_FLAT = &h8000
 		  
 		  return TestWindowStyle( p.Handle, BS_FLAT )
@@ -84,7 +84,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Flat(extends p as PushButton, assigns set as Boolean)
+		Sub FlatWFS(extends p as PushButton, assigns set as Boolean)
 		  Const BS_FLAT = &h8000
 		  
 		  ChangeWindowStyle( p.Handle, BS_FLAT, set )
@@ -92,7 +92,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub HasShield(extends pb as PushButton, assigns set as Boolean)
+		Sub HasShieldWFS(extends pb as PushButton, assigns set as Boolean)
 		  Const BCM_SETSHIELD = &h160C
 		  if set then
 		    call SendMessage( pb.Handle, BCM_SETSHIELD, 0, 1 )
@@ -103,7 +103,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function LeftJustified(extends p as PushButton) As Boolean
+		Function LeftJustifiedWFS(extends p as PushButton) As Boolean
 		  Const BS_LEFT = &h100
 		  
 		  return TestWindowStyle( p.Handle, BS_LEFT )
@@ -111,7 +111,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub LeftJustified(extends p as PushButton, assigns set as Boolean)
+		Sub LeftJustifiedWFS(extends p as PushButton, assigns set as Boolean)
 		  Const BS_LEFT = &h100
 		  
 		  ChangeWindowStyle( p.Handle, BS_LEFT, set )
@@ -119,28 +119,28 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function Multiline(extends p as PushButton) As Boolean
+		Function MultilineWFS(extends p as PushButton) As Boolean
 		  Const BS_MULTILINE = &h2000
 		  return TestWindowStyle( p.Handle, BS_MULTILINE )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Multiline(extends p as PushButton, assigns set as Boolean)
+		Sub MultilineWFS(extends p as PushButton, assigns set as Boolean)
 		  Const BS_MULTILINE = &h2000
 		  ChangeWindowStyle( p.Handle, BS_MULTILINE, set )
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function RightJustified(extends p as PushButton) As Boolean
+		Function RightJustifiedWFS(extends p as PushButton) As Boolean
 		  Const BS_RIGHT = &h200
 		  return TestWindowStyle( p.Handle, BS_RIGHT )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub RightJustified(extends p as PushButton, assigns set as Boolean)
+		Sub RightJustifiedWFS(extends p as PushButton, assigns set as Boolean)
 		  Const BS_RIGHT = &h200
 		  ChangeWindowStyle( p.Handle, BS_RIGHT, set )
 		End Sub
@@ -199,7 +199,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function TopJustified(extends p as PushButton) As Boolean
+		Function TopJustifiedWFS(extends p as PushButton) As Boolean
 		  Const BS_TOP = &h400
 		  
 		  return TestWindowStyle( p.Handle, BS_TOP )
@@ -207,7 +207,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub TopJustified(extends p as PushButton, assigns set as Boolean)
+		Sub TopJustifiedWFS(extends p as PushButton, assigns set as Boolean)
 		  Const BS_TOP = &h400
 		  
 		  ChangeWindowStyle( p.Handle, BS_TOP, set )
@@ -215,7 +215,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function VerticalCenterJustified(extends p as PushButton) As Boolean
+		Function VerticalCenterJustifiedWFS(extends p as PushButton) As Boolean
 		  Const BS_VCENTER = &hC00
 		  
 		  return TestWindowStyle( p.Handle, BS_VCENTER )
@@ -223,7 +223,7 @@ Protected Module PushButtonExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub VerticalCenterJustified(extends p as PushButton, assigns set as Boolean)
+		Sub VerticalCenterJustifiedWFS(extends p as PushButton, assigns set as Boolean)
 		  Const BS_VCENTER = &hC00
 		  
 		  ChangeWindowStyle( p.Handle, BS_VCENTER, set )

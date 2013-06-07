@@ -51,72 +51,82 @@ Protected Module EditFieldExtensionsWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub LineSpacing(extends EditField1 as EditField, spacing as Double)
-		  Dim EM_SETPARAFORMAT as Integer = &h400 + 71
-		  Dim EM_HIDESELECTION as Integer = &h400 + 63
-		  
-		  Dim paraFormat2 as new MemoryBlock( 188 )
-		  
-		  paraFormat2.Long( 0 ) = paraFormat2.Size
-		  
-		  Const PFM_LINESPACING = &h100
-		  Const PFM_SPACEAFTER = &h80
-		  paraFormat2.Long( 4 ) = PFM_LINESPACING
-		  
-		  dim spacingRule as Integer
-		  select case spacing
-		  case 1
-		    spacingRule = 0
-		  case 1.5
-		    spacingRule = 1
-		  case 2
-		    spacingRule = 2
-		  end select
-		  
-		  paraFormat2.Byte( 170 ) = spacingRule
-		  
-		  Declare Sub SendMessageA Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Ptr )
-		  
-		  // If the user has something selected, then we
-		  // want to apply to just that paragraph.  However,
-		  // if they don't have anything selected, then we
-		  // want to apply to the whole field.
-		  dim restoreSelectionPoint as Integer = -1
-		  if EditField1.SelLength > 0 then
-		    // Just use what the user has
-		  else
-		    // Hide the selection
-		    SendMessageA( EditField1.Handle, EM_HIDESELECTION, 1, nil )
+		Sub LineSpacingWFS(extends EditField1 as EditField, spacing as Double)
+		  #if TargetWin32
 		    
-		    restoreSelectionPoint = EditField1.SelStart
-		    EditField1.SelStart = 0
-		    EditField1.SelLength = -1
+		    Dim EM_SETPARAFORMAT as Integer = &h400 + 71
+		    Dim EM_HIDESELECTION as Integer = &h400 + 63
 		    
-		  end if
-		  
-		  // Set the format
-		  SendMessageA( EditField1.Handle, EM_SETPARAFORMAT, 0, paraFormat2 )
-		  
-		  if restoreSelectionPoint >= 0 then
-		    // Restore the selection
-		    EditField1.SelStart = restoreSelectionPoint
-		    EditField1.SelLength = 0
+		    Dim paraFormat2 as new MemoryBlock( 188 )
 		    
-		    // Show the selection
-		    SendMessageA( EditField1.Handle, EM_HIDESELECTION, 0, nil )
-		  end if
+		    paraFormat2.Long( 0 ) = paraFormat2.Size
+		    
+		    Const PFM_LINESPACING = &h100
+		    Const PFM_SPACEAFTER = &h80
+		    paraFormat2.Long( 4 ) = PFM_LINESPACING
+		    
+		    dim spacingRule as Integer
+		    select case spacing
+		    case 1
+		      spacingRule = 0
+		    case 1.5
+		      spacingRule = 1
+		    case 2
+		      spacingRule = 2
+		    end select
+		    
+		    paraFormat2.Byte( 170 ) = spacingRule
+		    
+		    Declare Sub SendMessageA Lib "User32" ( hwnd as Integer, msg as Integer, wParam as Integer, lParam as Ptr )
+		    
+		    // If the user has something selected, then we
+		    // want to apply to just that paragraph.  However,
+		    // if they don't have anything selected, then we
+		    // want to apply to the whole field.
+		    dim restoreSelectionPoint as Integer = -1
+		    if EditField1.SelLength > 0 then
+		      // Just use what the user has
+		    else
+		      // Hide the selection
+		      SendMessageA( EditField1.Handle, EM_HIDESELECTION, 1, nil )
+		      
+		      restoreSelectionPoint = EditField1.SelStart
+		      EditField1.SelStart = 0
+		      EditField1.SelLength = -1
+		      
+		    end if
+		    
+		    // Set the format
+		    SendMessageA( EditField1.Handle, EM_SETPARAFORMAT, 0, paraFormat2 )
+		    
+		    if restoreSelectionPoint >= 0 then
+		      // Restore the selection
+		      EditField1.SelStart = restoreSelectionPoint
+		      EditField1.SelLength = 0
+		      
+		      // Show the selection
+		      SendMessageA( EditField1.Handle, EM_HIDESELECTION, 0, nil )
+		    end if
+		    
+		  #else
+		    
+		    #pragma unused EditField1
+		    #pragma unused spacing
+		    
+		  #endif
+		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function Sunken(extends e as EditField) As Boolean
+		Function SunkenWFS(extends e as EditField) As Boolean
 		  Const ES_SUNKEN = &h4000
 		  return TestWindowStyle( e.Handle, ES_SUNKEN )
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Sunken(extends e as EditField, assigns set as Boolean)
+		Sub SunkenWFS(extends e as EditField, assigns set as Boolean)
 		  Const ES_SUNKEN = &h4000
 		  Const WS_EX_CLIENTEDGE = &h200
 		  ChangeWindowStyle( e.Handle, ES_SUNKEN, set )
