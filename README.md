@@ -8,7 +8,7 @@ The Windows Functionality Suite (previously known as the Win32 Declare Library) 
 
 **Version**
 
-v3.0
+v3.0.1
 
 
 **Contribute**
@@ -20,7 +20,7 @@ If you want to contribute to WFS, please submit a pull request.  We will accept 
 
 This code was originally written by Aaron Ballman for REALBasic (which is now Xojo).  There have been other contributors over the years, if we can figure them out we will note them below.
 
-As of v.3.0, global method names have been appended with "WFS"/
+As of v.3.0, global method names have been appended with "WFS".
 
 **Xojo \ Real Studio**
 

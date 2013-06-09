@@ -180,29 +180,40 @@ Protected Module VBWFS
 
 	#tag Method, Flags = &h1
 		Protected Sub DeleteSetting(appName as String, section as String, key as String = "")
-		  // First, we want to get a registry key that points
-		  // to the default location of all VB settings.
-		  dim base as new RegistryItem( kSettingsLocation )
-		  
-		  // Now we want to delve into the appName folder
-		  base = base.Child( appName )
-		  
-		  // If we don't have a key name, then we want to
-		  // delete the entire section.  Otherwise, we want
-		  // to delve into the section and delete the
-		  // key specified.
-		  if key = "" then
-		    base.Delete( section )
-		  else
-		    // Dive into the section
-		    base = base.Child( section )
-		    // And delete the key
-		    base.Delete( key )
-		  end if
-		  
+		  #if TargetWin32
+		    
+		    // First, we want to get a registry key that points
+		    // to the default location of all VB settings.
+		    dim base as new RegistryItem( kSettingsLocation )
+		    
+		    // Now we want to delve into the appName folder
+		    base = base.Child( appName )
+		    
+		    // If we don't have a key name, then we want to
+		    // delete the entire section.  Otherwise, we want
+		    // to delve into the section and delete the
+		    // key specified.
+		    if key = "" then
+		      base.Delete( section )
+		    else
+		      // Dive into the section
+		      base = base.Child( section )
+		      // And delete the key
+		      base.Delete( key )
+		    end if
+		    
 		Exception err as RegistryAccessErrorException
 		  // Something bad happened, so let's just bail out
 		  return
+		  
+		  #else
+		    
+		    #pragma unused appName
+		    #pragma unused section
+		    #pragma unused key
+		    
+		  #endif
+		  
 		End Sub
 	#tag EndMethod
 
@@ -332,6 +343,9 @@ Protected Module VBWFS
 		Protected Function FV(rate as Double, nper as Integer, pmt as Double, pv as Double = 0, type as Integer = 0) As Double
 		  // These equations come from gnucash
 		  // http://www.gnucash.org/docs/v1.8/C/gnucash-guide/loans_calcs1.html
+		  
+		  if type <> 0 then type = 1
+		  
 		  dim a as Double = (1 + rate) ^ nper - 1
 		  dim b as Double = (1 + rate * type) / rate
 		  dim c as Double = pmt * b
@@ -506,16 +520,27 @@ Protected Module VBWFS
 	#tag Method, Flags = &h1
 		Protected Function IPmt(rate as Double, per as Integer, nper as Integer, pv as Double, fv as Double = 0, type as Integer = 0) As Double
 		  // IPmt is the principle for the previous month times the interest rate
-		  // http://www.gnome.org/projects/gnumeric/doc/gnumeric-IPMT.shtml
+		  // http://www.gnucash.org/docs/v1.8/C/gnucash-guide/loans_calcs1.html
 		  
-		  // IMPLEMENT THIS -KT
+		  if per > nper then
+		    raise new OutOfBoundsException
+		  end if
 		  
-		  #pragma unused rate
-		  #pragma unused per
-		  #pragma unused nper
-		  #pragma unused pv
-		  #pragma unused fv
-		  #pragma unused type
+		  if type <> 0 then type = 1
+		  
+		  dim pay as double = 0 - Pmt( rate, nper, pv, fv, type ) // Make it positive
+		  dim remainingPrinc as double = pv
+		  if type = 1 then
+		    remainingPrinc = remainingPrinc - pay
+		    per = per - 1
+		  end if
+		  dim periodInterest as double
+		  for period as integer = 1 to per
+		    periodInterest = remainingPrinc * rate
+		    remainingPrinc = remainingPrinc - ( pay - periodInterest )
+		  next period
+		  
+		  return 0 - periodInterest // Make it negative
 		  
 		End Function
 	#tag EndMethod
@@ -827,10 +852,24 @@ Protected Module VBWFS
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Sub pAssertIf(testResult As Boolean)
+		  if testResult then
+		    dim err as new RuntimeException
+		    err.Message = "Unit Test assertion failed"
+		    raise err
+		  end if
+		  
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h1
 		Protected Function Pmt(rate as Double, nper as Integer, pv as Double, fv as Double = 0, type as Integer = 0) As Double
 		  // These equations come from gnucash
 		  // http://www.gnucash.org/docs/v1.8/C/gnucash-guide/loans_calcs1.html
+		  
+		  if type <> 0 then type = 1
+		  
 		  dim a as Double = (1 + rate) ^ nper - 1
 		  dim b as Double = (1 + rate * type) / rate
 		  
@@ -843,6 +882,7 @@ Protected Module VBWFS
 		Protected Function PPmt(rate as Double, per as Integer, nper as Integer, pv as Double, fv as Double = 0, type as Integer = 0) As Double
 		  // PPmt is just the Pmt - IPmt, according to
 		  // http://www.gnome.org/projects/gnumeric/doc/gnumeric-PPMT.shtml
+		  
 		  return Pmt( rate, nper, pv, fv, type ) - IPmt( rate, per, nper, pv, fv, type )
 		End Function
 	#tag EndMethod
@@ -851,6 +891,9 @@ Protected Module VBWFS
 		Protected Function PV(rate as Double, nper as Integer, pmt as Double, fv as Double = 0, type as Integer = 0) As Double
 		  // These equations come from gnucash
 		  // http://www.gnucash.org/docs/v1.8/C/gnucash-guide/loans_calcs1.html
+		  
+		  if type <> 0 then type = 1
+		  
 		  dim a as Double = (1 + rate) ^ nper - 1
 		  dim b as Double = (1 + rate * type) / rate
 		  dim c as Double = pmt * b
@@ -985,6 +1028,14 @@ Protected Module VBWFS
 	#tag Method, Flags = &h1
 		Protected Function Rnd() As Double
 		  return mRnd.Number
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function RoundTo(value As Double, places As Integer) As Double
+		  dim mult as double = 10.^places
+		  return round( value * mult ) / mult
+		  
 		End Function
 	#tag EndMethod
 
@@ -1467,6 +1518,63 @@ Protected Module VBWFS
 		  // subtracting the totalseconds of each
 		  return d.TotalSeconds - midnight.TotalSeconds
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Attributes( hidden ) Protected Sub UnitTests()
+		  // Values that are used to validate results of Pmt, PPmt and IPmt were calculated with those functions in Excel
+		  
+		  dim presentVal as double = 10000
+		  dim futureVal as double = 0
+		  dim periodIndex as integer = 10
+		  dim totalPeriods as integer = 12
+		  dim periodRate as double = 0.1 / totalPeriods
+		  dim type as integer = 0
+		  
+		  dim thisPayment as double = Pmt( periodRate, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( thisPayment, 2 ) <> -879.16 )
+		  
+		  dim interestPayment as double = IPmt( periodRate, periodIndex, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( interestPayment, 2 ) <> -21.62 )
+		  
+		  dim princPayment as double = PPmt( periodRate, periodIndex, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( princPayment, 2 ) <> -857.54 )
+		  
+		  type = 1
+		  
+		  thisPayment = Pmt( periodRate, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( thisPayment, 2 ) <> -871.89 )
+		  
+		  interestPayment = IPmt( periodRate, periodIndex, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( interestPayment, 2 ) <> -21.44 )
+		  
+		  princPayment = PPmt( periodRate, periodIndex, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( princPayment, 2 ) <> -850.45 )
+		  
+		  type = 0
+		  futureVal = 1000
+		  
+		  thisPayment = Pmt( periodRate, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( thisPayment, 2 ) <> -958.74 )
+		  
+		  interestPayment = IPmt( periodRate, periodIndex, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( interestPayment, 2 ) <> -15.45 )
+		  
+		  princPayment = PPmt( periodRate, periodIndex, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( princPayment, 2 ) <> -943.30 )
+		  
+		  type = 1
+		  
+		  thisPayment = Pmt( periodRate, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( thisPayment, 2 ) <> -950.82 )
+		  
+		  interestPayment = IPmt( periodRate, periodIndex, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( interestPayment, 2 ) <> -15.32 )
+		  
+		  princPayment = PPmt( periodRate, periodIndex, totalPeriods, presentVal, futureVal, type )
+		  pAssertIf( RoundTo( princPayment, 2 ) <> -935.50 )
+		  
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
