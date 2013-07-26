@@ -142,6 +142,7 @@ Protected Class DateTimePickerWFS
 			Visible=true
 			Group="ID"
 			InitialValue="-2147483648"
+			Type="Integer"
 			InheritedFrom="Object"
 		#tag EndViewProperty
 		#tag ViewProperty
