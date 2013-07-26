@@ -589,6 +589,35 @@ Protected Module SystemInformationWFS
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
+		Protected Function SetSystemTime(value As Date) As Boolean
+		  #if TargetWin32
+		    
+		    // Implements SetSystemTime as described here:
+		    // http://msdn.microsoft.com/en-us/library/windows/desktop/ms724942(v=vs.85).aspx
+		    
+		    value = new date( value ) // Clone it
+		    value.TotalSeconds = value.TotalSeconds - ( value.GMTOffset * 3600 ) // Adjust for time zone
+		    
+		    Soft Declare Function funcSetSystemTime Lib "Kernel32" alias "SetSystemTime" ( ByRef st as SystemTimeStruct ) as Boolean
+		    
+		    dim st as SystemTimeStruct
+		    st.wYear = value.Year
+		    st.wMonth = value.Month
+		    st.wDayOfWeek = value.DayOfWeek
+		    st.wDay = value.Day
+		    st.wHour = value.Hour
+		    st.wMinute = value.Minute
+		    st.wSecond = value.Second
+		    st.wMillisecond = 0
+		    
+		    return funcSetSystemTime( st )
+		    
+		  #endif
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Function Shutdown(mode as Integer) As Boolean
 		  #if TargetWin32
 		    
@@ -900,6 +929,18 @@ Protected Module SystemInformationWFS
 
 	#tag Constant, Name = kShutdownModeShutdown, Type = Double, Dynamic = False, Default = \"1", Scope = Protected
 	#tag EndConstant
+
+
+	#tag Structure, Name = SystemTimeStruct, Flags = &h21
+		wYear As Int16
+		  wMonth As Int16
+		  wDayOfWeek As Int16
+		  wDay As Int16
+		  wHour As Int16
+		  wMinute As Int16
+		  wSecond As Int16
+		wMillisecond As Int16
+	#tag EndStructure
 
 
 	#tag ViewBehavior
