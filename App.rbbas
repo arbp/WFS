@@ -3,6 +3,11 @@ Protected Class App
 Inherits Application
 	#tag Event
 		Sub Open()
+		  #if not TargetWin32
+		    MsgBox "While the Windows Functionality Suite will compile on any platform, this harness app is meant to be run on Windows only."
+		    Quit
+		  #endif
+		  
 		  VBWFS.UnitTests
 		End Sub
 	#tag EndEvent
