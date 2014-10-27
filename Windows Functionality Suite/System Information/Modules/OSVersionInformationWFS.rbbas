@@ -154,8 +154,14 @@ Protected Module OSVersionInformationWFS
 		    mextraInfo = szCSDVersion
 		    if mplatformId = 2 then 'NT
 		      mIsNx = true
-		      if mMajorVersion = 6 then ' Vista
-		        mIsVista = true
+		      if mMajorVersion = 8 then
+		        mIs8 = true
+		      elseif mMajorVersion = 6 then ' Vista
+			if mMinorVersion = 0 then
+			  mIsVista = true
+			elseif mMinorVersion = 1 then
+			  mIs7 = true
+			 end if
 		      elseif mmajorversion = 4 then 'NT4
 		        mOSName = "Windows NT 4.0"
 		        mIsNT4 = true
@@ -483,6 +489,14 @@ Protected Module OSVersionInformationWFS
 
 	#tag Property, Flags = &h21
 		Private mIs2K As boolean
+	#tag EndProperty
+	
+	#tag Property, Flags = &h21
+		Private mIs7 As boolean
+	#tag EndProperty
+	
+	#tag Property, Flags = &h21
+		Private mIs8 As boolean
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
