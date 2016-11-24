@@ -8,7 +8,7 @@ The Windows Functionality Suite (previously known as the Win32 Declare Library) 
 
 **Version**
 
-v3.1
+v3.2
 
 
 **Contribute**
@@ -24,7 +24,7 @@ As of v.3.0, global method names have been appended with "WFS".
 
 **Xojo \ Real Studio**
 
-* Version 2011R1.1
+* Version 2013R3
 
 
 **Repository Locations**
@@ -57,3 +57,4 @@ As of v.3.0, global method names have been appended with "WFS".
 * Alessandro Consorti
 * Kem Tekinay
 * Brandon Skrtich
+* Eugene Dakin
