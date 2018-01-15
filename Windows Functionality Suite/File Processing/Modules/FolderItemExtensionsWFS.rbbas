@@ -760,17 +760,24 @@ Protected Module FolderItemExtensionsWFS
 		  #if TargetWin32
 		    
 		    Soft Declare Function CreateProcessW Lib "Kernel32" ( appName as WString, params as WString, _
-		    procAttribs as Integer, threadAttribs as Integer, inheritHandles as Boolean, flags as Integer, _
+		    procAttribs as Integer, threadAttribs as Integer, inheritHandles as Boolean, flags as UInt32, _
 		    env as Integer, curDir as Integer, startupInfo as Ptr, procInfo as Ptr ) as Boolean
 		    
 		    Soft Declare Function CreateProcessA Lib "Kernel32" ( appName as CString, params as CString, _
-		    procAttribs as Integer, threadAttribs as Integer, inheritHandles as Boolean, flags as Integer, _
+		    procAttribs as Integer, threadAttribs as Integer, inheritHandles as Boolean, flags as UInt32, _
 		    env as Integer, curDir as Integer, startupInfo as Ptr, procInfo as Ptr ) as Boolean
 		    
 		    dim startupInfo, procInfo as MemoryBlock
 		    
-		    startupInfo = new MemoryBlock( 17 * 4 )
-		    procInfo = new MemoryBlock( 16 )
+		    #If Target64Bit
+		      Const sizeOfPtr = 8
+		      startupInfo = New MemoryBlock( 104 )
+		    #Else
+		      Const sizeOfPtr = 4
+		      startupInfo = New MemoryBlock( 68 )
+		    #EndIf
+		    		    
+		    procInfo = new MemoryBlock( (2 * sizeOfPtr) + 4 + 4 )
 		    
 		    dim unicodeSavvy as Boolean = System.IsFunctionAvailable( "CreateProcessW", "Kernel32" )
 		    
@@ -784,7 +791,7 @@ Protected Module FolderItemExtensionsWFS
 		        deskStr = deskName + Chr( 0 )
 		      end if
 		      
-		      startupInfo.Ptr( 8 ) = deskStr
+		      startupInfo.Ptr( (2 * sizeOfPtr) ) = deskStr
 		    end if
 		    
 		    dim ret as Boolean
@@ -810,7 +817,7 @@ Protected Module FolderItemExtensionsWFS
 		    
 		    Declare Sub CloseHandle Lib "Kernel32" ( handle as Integer )
 		    CloseHandle( procInfo.Long( 0 ) )
-		    CloseHandle( procInfo.Long( 4 ) )
+		    CloseHandle( procInfo.Long( sizeOfPtr ) )
 		    
 		  #else
 		    
