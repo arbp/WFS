@@ -8,7 +8,7 @@ The Windows Functionality Suite (previously known as the Win32 Declare Library) 
 
 **Version**
 
-v3.2
+v3.3
 
 
 **Contribute**
@@ -58,3 +58,4 @@ As of v.3.0, global method names have been appended with "WFS".
 * Kem Tekinay
 * Brandon Skrtich
 * Eugene Dakin
+* Jim McKay
